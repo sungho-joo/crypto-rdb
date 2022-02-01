@@ -16,4 +16,4 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     
     volumes:
-      - ./docker_space:/var/lib/mysql
+      - $PWD/docker_space:/var/lib/mysql
