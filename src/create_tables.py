@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Create tables using SQLAlchemy ORM
+Creation for tables related to crypto using SQLAlchemy ORM
 
 Author:
     Name: Dongmin Lee
@@ -35,7 +35,9 @@ Base = declarative_base()
 
 
 class Ticker(Base):  # type: ignore
-    """Ticker class"""
+    """
+    Ticker table class
+    """
 
     __tablename__ = "ticker"
 
@@ -47,7 +49,9 @@ class Ticker(Base):  # type: ignore
 
 
 class Trade(Base):  # type: ignore
-    """Trade class"""
+    """
+    Trade table class
+    """
 
     __tablename__ = "trade"
 
@@ -67,7 +71,9 @@ class Trade(Base):  # type: ignore
 
 
 class Accumulation(Base):  # type: ignore
-    """Accumulation class"""
+    """
+    Accumulation table class
+    """
 
     __tablename__ = "accumulation"
 
@@ -89,7 +95,9 @@ class Accumulation(Base):  # type: ignore
 
 
 class Price(Base):  # type: ignore
-    """Price class"""
+    """
+    Price table class
+    """
 
     __tablename__ = "price"
 
@@ -111,7 +119,9 @@ class Price(Base):  # type: ignore
 
 
 class Change(Base):  # type: ignore
-    """Change class"""
+    """
+    Change table class
+    """
 
     __tablename__ = "change"
 
