@@ -3,7 +3,7 @@ format:
 		isort .
 
 lint:
-		env PYTHONPATH=. pytest --pylint --flake8 --mypy --ignore=src/wandb --ignore=test
+		env PYTHONPATH=. pytest --pylint --flake8 --mypy
 
 utest:
 		env PYTHONPATH=. pytest test/unittest/ -s
@@ -11,4 +11,3 @@ utest:
 setup:
 		pip install -r requirements.txt
 		pre-commit install
-		mkdir db

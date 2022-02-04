@@ -1,19 +1,18 @@
 version: "3"
+
 services:
   db:
-    image: mysql:5.7
+    image: mariadb:10
     restart: always
-    container_name: mysql-server
+    container_name: mariadb-server
     ports:
       - 5555:3306
     environment:
-      MYSQL_DATABASE: mysql-docker
-      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: 20220201
+      MYSQL_DATABASE: crypto-rdb
       TZ: Asia/Seoul
-    
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-    
     volumes:
       - $PWD/docker_space:/var/lib/mysql
