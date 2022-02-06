@@ -21,20 +21,21 @@ market_code = ["KRW-BTC", "KRW-ETH"]
 
 def get_existing_tickers(stmt: db.sql) -> List[Ticker]:
     """Get existing records from Ticker table"""
-    rows = []
+    records = []
     with Session(engine) as session:
-        print(list(session.execute(stmt).keys()))
-        rows = session.execute(stmt).all()
-        for row in rows:
-            print(row)
-    return rows
+        print(f"Columns: {list(session.execute(stmt).keys())}")
+        records = session.execute(stmt).all()
+        for i, record in enumerate(records):
+            print(f"{i}: {record}")
+    return records
 
 
 def update_tickers(code_idx: Dict[str, int]) -> None:
     """Update data on Ticker table"""
     selected_code = set()
-    for element in get_existing_tickers(db.select(Ticker)):
-        selected_code.add(element[0].market_code)
+    records = get_existing_tickers(db.select(Ticker))
+    for record in records:
+        selected_code.add(record[0].market_code)
 
     objects = []
     for key, value in code_idx.items():
@@ -93,7 +94,9 @@ def insert_data_into_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dict
 
 
 if __name__ == "__main__":
-    all_tickers = set(pyupbit.get_tickers())
+    all_tickers = pyupbit.get_tickers()
+    # if market_code not in all_tickers:
+    #     raise "Not exist market_code list in all_tickers"
     assert market_code in all_tickers, "Not exist market_code list in all_tickers"
 
     market_code_idx = {}

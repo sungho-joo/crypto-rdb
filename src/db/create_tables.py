@@ -10,7 +10,6 @@ Author:
 
 import sqlalchemy as db
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy_utils import create_database, database_exists
 
 config = {
     "host": "db",
@@ -28,8 +27,6 @@ db_name = config.get("database")
 
 connection_str = f"mariadb+pymysql://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}"
 engine = db.create_engine(connection_str, echo=True, future=True)
-if not database_exists(engine.url):
-    create_database(engine.url)
 
 Base = declarative_base()
 
