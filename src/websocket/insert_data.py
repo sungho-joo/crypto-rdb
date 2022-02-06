@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Data insertion related to crypto using SQLAlchemy ORM from tables
+Data insertion into tables related to crypto using SQLAlchemy ORM
 
 Author:
     Name: Dongmin Lee
@@ -30,8 +30,8 @@ def get_existing_tickers(stmt: db.sql) -> List[Ticker]:
     return records
 
 
-def update_tickers(code_idx: Dict[str, int]) -> None:
-    """Update data on Ticker table"""
+def insert_tickers(code_idx: Dict[str, int]) -> None:
+    """Insert data into Ticker table"""
     selected_code = set()
     records = get_existing_tickers(db.select(Ticker))
     for record in records:
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     market_code_idx = {}
     for i, code in enumerate(market_code):
         market_code_idx[code] = i + 1
-    update_tickers(market_code_idx)
+    insert_tickers(market_code_idx)
 
     web_socket = pyupbit.WebSocketManager("ticker", market_code)
     insert_data_into_tables(web_socket, market_code_idx)
