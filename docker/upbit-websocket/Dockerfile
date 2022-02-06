@@ -1,6 +1,7 @@
 FROM amancevice/pandas:1.4.0-alpine
-WORKDIR /usr/src/app
+WORKDIR /usr/app
 COPY requirements.txt requirements.txt
+ADD ./src /usr/app/src
 RUN pip install --upgrade pip
 
 RUN apk add build-base
