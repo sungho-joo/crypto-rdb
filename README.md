@@ -20,7 +20,7 @@ The high-level structure of the repository is:
 
     ├── src
         ├── db
-        ├── upbit
+        ├── websocket
         └── utils
     └── configs
 
