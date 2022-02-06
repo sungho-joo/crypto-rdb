@@ -16,3 +16,16 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - $PWD/docker_space:/var/lib/mysql
+
+  upbit:
+    build:
+      context: .
+      dockerfile: ./docker/upbit-websocket/Dockerfile
+    container_name: upbit-websocket-server
+    environment:
+      TZ: Asia/Seoul
+    depends_on:
+      - "db"
+    tty: true
+
+    
