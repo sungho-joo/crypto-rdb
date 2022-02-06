@@ -8,7 +8,7 @@ Author:
     Email: kid33629@gmail.com
 """
 
-from typing import List
+from typing import Dict, List
 
 import pyupbit
 import sqlalchemy as db
@@ -19,92 +19,87 @@ from src.db.create_tables import Accumulation, Change, Price, Ticker, Trade, eng
 market_code = ["KRW-BTC", "KRW-ETH"]
 
 
-def select(stmt: db.sql) -> List[Ticker]:
-    """Select function"""
+def get_existing_tickers(stmt: db.sql) -> List[Ticker]:
+    """Get existing records from Ticker table"""
     rows = []
     with Session(engine) as session:
         print(list(session.execute(stmt).keys()))
-        for row in session.execute(stmt):
-            rows.append(row)
+        rows = session.execute(stmt).all()
+        for row in rows:
             print(row)
-        print("\n")
     return rows
 
 
-if __name__ == "__main__":
-    all_tickers = pyupbit.get_tickers()
+def update_tickers(code_idx: Dict[str, int]) -> None:
+    """Update data on Ticker table"""
+    selected_code = set()
+    for element in get_existing_tickers(db.select(Ticker)):
+        selected_code.add(element[0].market_code)
 
-    market_code_idx = {}
-    for i, code in enumerate(market_code):
-        market_code_idx[code] = i + 1
-
-    wm = pyupbit.WebSocketManager("ticker", market_code)
-
-# if ticker에 데이터가 존재하면, pass
-# otherwise 실행
-# select count(*) from ticker
-results = select(db.select(Ticker))
-for elem in results:
-    print(f"id : {elem[0].id}, market_code: {elem[0].market_code}")
-print(results)
-
-objects = []
-for code in market_code:
-    objects.append(
-        Ticker(id=None, market_code=code),
-    )
-
-with Session(engine) as session:
-    session.add_all(objects)
-    session.commit()
-
-select(db.select(Ticker))
-
-
-while True:
-    data = wm.get()
-
-    objects = [
-        Trade(
-            id=None,
-            trade_date=data["trade_date"],
-            trade_time=data["trade_time"],
-            trade_volume=data["trade_volume"],
-            ticker_id=market_code_idx[data["code"]],
-        ),
-        Accumulation(
-            id=None,
-            acc_ask_volume=data["acc_ask_volume"],
-            acc_bid_volume=data["acc_bid_volume"],
-            acc_trade_volume=data["acc_trade_volume"],
-            acc_trade_price=data["acc_trade_price"],
-            ticker_id=market_code_idx[data["code"]],
-        ),
-        Price(
-            id=None,
-            opening_price=data["opening_price"],
-            high_price=data["high_price"],
-            low_price=data["low_price"],
-            trade_price=data["trade_price"],
-            ticker_id=market_code_idx[data["code"]],
-        ),
-        Change(
-            id=None,
-            closing_price=data["prev_closing_price"],
-            change_state=data["change"],
-            change_price=data["change_price"],
-            change_rate=data["change_rate"],
-            ticker_id=market_code_idx[data["code"]],
-        ),
-    ]
+    objects = []
+    for key, value in code_idx.items():
+        if key not in selected_code:
+            objects.append(
+                Ticker(id=value, market_code=key),
+            )
 
     with Session(engine) as session:
         session.add_all(objects)
         session.commit()
 
-    # select(db.select(Trade))
-    # select(db.select(Accumulation))
-    # select(db.select(Price))
-    # select(db.select(Change))
 
-wm.terminate()
+def insert_data_into_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dict[str, int]) -> None:
+    """Insert data into other tables (e.g., Trade, Accumulation, Price, Change)"""
+    while True:
+        data = web_socket.get()
+
+        objects = [
+            Trade(
+                id=None,
+                trade_date=data["trade_date"],
+                trade_time=data["trade_time"],
+                trade_volume=data["trade_volume"],
+                ticker_id=code_idx[data["code"]],
+            ),
+            Accumulation(
+                id=None,
+                acc_ask_volume=data["acc_ask_volume"],
+                acc_bid_volume=data["acc_bid_volume"],
+                acc_trade_volume=data["acc_trade_volume"],
+                acc_trade_price=data["acc_trade_price"],
+                ticker_id=code_idx[data["code"]],
+            ),
+            Price(
+                id=None,
+                opening_price=data["opening_price"],
+                high_price=data["high_price"],
+                low_price=data["low_price"],
+                trade_price=data["trade_price"],
+                ticker_id=code_idx[data["code"]],
+            ),
+            Change(
+                id=None,
+                closing_price=data["prev_closing_price"],
+                change_state=data["change"],
+                change_price=data["change_price"],
+                change_rate=data["change_rate"],
+                ticker_id=code_idx[data["code"]],
+            ),
+        ]
+
+        with Session(engine) as session:
+            session.add_all(objects)
+            session.commit()
+
+
+if __name__ == "__main__":
+    all_tickers = set(pyupbit.get_tickers())
+    assert market_code in all_tickers, "Not exist market_code list in all_tickers"
+
+    market_code_idx = {}
+    for i, code in enumerate(market_code):
+        market_code_idx[code] = i + 1
+    update_tickers(market_code_idx)
+
+    web_socket = pyupbit.WebSocketManager("ticker", market_code)
+    insert_data_into_tables(web_socket, market_code_idx)

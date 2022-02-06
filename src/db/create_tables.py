@@ -13,9 +13,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import create_database, database_exists
 
 config = {
-    "host": "localhost",
+    "host": "db",
     "user": "root",
-    "port": "5557",
+    "port": "3306",
     "password": 20220201,
     "database": "crypto-rdb",
 }
