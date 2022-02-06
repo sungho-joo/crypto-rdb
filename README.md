@@ -19,6 +19,10 @@ $ make setup
 The high-level structure of the repository is:
 
     ├── src
+        ├── db
+        ├── upbit
+        └── utils
+    └── configs
 
 TBD
 

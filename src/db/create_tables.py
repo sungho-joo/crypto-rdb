@@ -15,7 +15,7 @@ from sqlalchemy_utils import create_database, database_exists
 config = {
     "host": "localhost",
     "user": "root",
-    "port": "5555",
+    "port": "5557",
     "password": 20220201,
     "database": "crypto-rdb",
 }
@@ -41,7 +41,7 @@ class Ticker(Base):  # type: ignore
 
     __tablename__ = "ticker"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     market_code = db.Column(db.VARCHAR(20), nullable=False)
 
     def __repr__(self) -> str:
