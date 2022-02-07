@@ -12,9 +12,9 @@ import sqlalchemy as db
 from sqlalchemy.ext.declarative import declarative_base
 
 config = {
-    "host": "db",
+    "host": "mariadb",
     "user": "root",
-    "port": "3306",
+    "port": 3306,
     "password": 20220201,
     "database": "crypto-rdb",
 }

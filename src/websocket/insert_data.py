@@ -95,7 +95,7 @@ def insert_data_into_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dict
 
 if __name__ == "__main__":
     all_tickers = pyupbit.get_tickers()
-    assert market_code in all_tickers, "Not exist market_code list in all_tickers"
+    assert all(code in all_tickers for code in market_code), "Not exist market_code list in all_tickers"
 
     market_code_idx = {}
     for i, code in enumerate(market_code):
