@@ -32,8 +32,9 @@ def get_existing_tickers(stmt: db.sql) -> List[Ticker]:
 
 def insert_tickers(code_idx: Dict[str, int]) -> None:
     """Insert data into Ticker table"""
-    selected_code = set()
     records = get_existing_tickers(db.select(Ticker))
+
+    selected_code = set()
     for record in records:
         selected_code.add(record[0].market_code)
 
