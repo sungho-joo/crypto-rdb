@@ -19,7 +19,7 @@ from src.db.create_tables import Accumulation, Change, Price, Ticker, Trade, eng
 market_code = ["KRW-BTC", "KRW-ETH"]
 
 
-def get_existing_tickers(stmt: db.sql) -> List[Ticker]:
+def get_existing_tickers(stmt: db.sql.Select) -> List[Ticker]:
     """Get existing records from Ticker table"""
     records = []
     with Session(engine) as session:
@@ -30,7 +30,7 @@ def get_existing_tickers(stmt: db.sql) -> List[Ticker]:
     return records
 
 
-def insert_tickers(code_idx: Dict[str, int]) -> None:
+def insert_into_ticker_table(code_idx: Dict[str, int]) -> None:
     """Insert data into Ticker table"""
     records = get_existing_tickers(db.select(Ticker))
 
@@ -50,7 +50,7 @@ def insert_tickers(code_idx: Dict[str, int]) -> None:
         session.commit()
 
 
-def insert_data_into_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dict[str, int]) -> None:
+def insert_into_other_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dict[str, int]) -> None:
     """Insert data into other tables (e.g., Trade, Accumulation, Price, Change)"""
     while True:
         data = web_socket.get()
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     market_code_idx = {}
     for i, code in enumerate(market_code):
         market_code_idx[code] = i + 1
-    insert_tickers(market_code_idx)
+    insert_into_ticker_table(market_code_idx)
 
     web_socket = pyupbit.WebSocketManager("ticker", market_code)
-    insert_data_into_tables(web_socket, market_code_idx)
+    insert_into_other_tables(web_socket, market_code_idx)
