@@ -14,11 +14,37 @@ Clone this repository and run the following command.
 $ make setup
 ```
 
+## Python Path
+
+To set python path, move to `crypto-rdb/`.
+
+```shell
+$ cd crypto-rdb
+```
+
+If setting python path on `bashrc`:
+
+```shell
+$ echo "export DB_HOME=$(pwd)" >> ~/.bashrc
+$ echo 'export PYTHONPATH=$DB_HOME:$PYTHONPATH' >> ~/.bashrc
+```
+
+If setting python path on `zshrc`:
+
+```shell
+$ echo "export DB_HOME=$(pwd)" >> ~/.zshrc
+$ echo 'export PYTHONPATH=$DB_HOME:$PYTHONPATH' >> ~/.zshrc
+```
+
 ## Usages
 
 The high-level structure of the repository is:
 
     ├── src
+        ├── db
+        ├── websocket
+        └── utils
+    └── configs
 
 TBD
 

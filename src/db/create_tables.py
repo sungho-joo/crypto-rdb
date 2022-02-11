@@ -10,12 +10,11 @@ Author:
 
 import sqlalchemy as db
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy_utils import create_database, database_exists
 
 config = {
-    "host": "localhost",
+    "host": "mariadb",
     "user": "root",
-    "port": "5555",
+    "port": 3306,
     "password": 20220201,
     "database": "crypto-rdb",
 }
@@ -28,8 +27,6 @@ db_name = config.get("database")
 
 connection_str = f"mariadb+pymysql://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}"
 engine = db.create_engine(connection_str, echo=True, future=True)
-if not database_exists(engine.url):
-    create_database(engine.url)
 
 Base = declarative_base()
 
@@ -41,7 +38,7 @@ class Ticker(Base):  # type: ignore
 
     __tablename__ = "ticker"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     market_code = db.Column(db.VARCHAR(20), nullable=False)
 
     def __repr__(self) -> str:
