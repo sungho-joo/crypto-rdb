@@ -67,12 +67,12 @@ class Trade(Base):  # type: ignore
         )
 
 
-class Accumulation(Base):  # type: ignore
+class Accum(Base):  # type: ignore
     """
     Accumulation table class
     """
 
-    __tablename__ = "accumulation"
+    __tablename__ = "accum"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     acc_ask_volume = db.Column(db.FLOAT(30), nullable=False)
@@ -85,7 +85,7 @@ class Accumulation(Base):  # type: ignore
 
     def __repr__(self) -> str:
         return (
-            f"Accumulation(id={self.id!r}, acc_ask_volume={self.acc_ask_volume!r}, "
+            f"Accum(id={self.id!r}, acc_ask_volume={self.acc_ask_volume!r}, "
             f"acc_bid_volume={self.acc_bid_volume!r}, acc_trade_volume={self.acc_trade_volume!r}, "
             f"acc_trade_price={self.acc_trade_price!r}, ticker_id={self.ticker_id!r})"
         )
@@ -115,12 +115,12 @@ class Price(Base):  # type: ignore
         )
 
 
-class Change(Base):  # type: ignore
+class Diff(Base):  # type: ignore
     """
-    Change table class
+    Diff table class
     """
 
-    __tablename__ = "change"
+    __tablename__ = "diff"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     closing_price = db.Column(db.FLOAT(30), nullable=False)
@@ -133,7 +133,7 @@ class Change(Base):  # type: ignore
 
     def __repr__(self) -> str:
         return (
-            f"Change(id={self.id!r}, closing_price={self.closing_price!r}, "
+            f"Diff(id={self.id!r}, closing_price={self.closing_price!r}, "
             f"change_state={self.change_state!r}, change_price={self.change_price!r}, "
             f"change_rate={self.change_rate!r}, ticker_id={self.ticker_id!r})"
         )
