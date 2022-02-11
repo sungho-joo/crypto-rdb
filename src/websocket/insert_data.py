@@ -14,7 +14,7 @@ import pyupbit
 import sqlalchemy as db
 from sqlalchemy.orm import Session
 
-from src.db.create_tables import Accumulation, Change, Price, Ticker, Trade, engine
+from src.db.create_tables import Accum, Diff, Price, Ticker, Trade, engine
 
 market_code = ["KRW-BTC", "KRW-ETH"]
 
@@ -51,7 +51,7 @@ def insert_into_ticker_table(code_idx: Dict[str, int]) -> None:
 
 
 def insert_into_other_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dict[str, int]) -> None:
-    """Insert data into other tables (e.g., Trade, Accumulation, Price, Change)"""
+    """Insert data into other tables (e.g., Trade, Accum, Price, Diff)"""
     while True:
         data = web_socket.get()
 
@@ -63,7 +63,7 @@ def insert_into_other_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dic
                 trade_volume=data["trade_volume"],
                 ticker_id=code_idx[data["code"]],
             ),
-            Accumulation(
+            Accum(
                 id=None,
                 acc_ask_volume=data["acc_ask_volume"],
                 acc_bid_volume=data["acc_bid_volume"],
@@ -79,7 +79,7 @@ def insert_into_other_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dic
                 trade_price=data["trade_price"],
                 ticker_id=code_idx[data["code"]],
             ),
-            Change(
+            Diff(
                 id=None,
                 closing_price=data["prev_closing_price"],
                 change_state=data["change"],
