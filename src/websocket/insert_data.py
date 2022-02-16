@@ -61,6 +61,7 @@ def insert_into_other_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dic
                 trade_date=data["trade_date"],
                 trade_time=data["trade_time"],
                 trade_volume=data["trade_volume"],
+                trade_price=data["trade_price"],
                 ticker_id=code_idx[data["code"]],
             ),
             Accum(
@@ -76,7 +77,6 @@ def insert_into_other_tables(web_socket: pyupbit.WebSocketManager, code_idx: Dic
                 opening_price=data["opening_price"],
                 high_price=data["high_price"],
                 low_price=data["low_price"],
-                trade_price=data["trade_price"],
                 ticker_id=code_idx[data["code"]],
             ),
             Diff(

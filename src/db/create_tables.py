@@ -12,7 +12,7 @@ import sqlalchemy as db
 from sqlalchemy.ext.declarative import declarative_base
 
 config = {
-    "host": "mariadb",
+    "host": "db",
     "user": "root",
     "port": 3306,
     "password": 20220201,
@@ -56,14 +56,16 @@ class Trade(Base):  # type: ignore
     trade_date = db.Column(db.DATE, nullable=False)
     trade_time = db.Column(db.TIME, nullable=False)
     trade_volume = db.Column(db.FLOAT(30), nullable=False)
+    trade_price = db.Column(db.FLOAT(30), nullable=False)
     ticker_id = db.Column(
         db.Integer, db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE")
     )
 
     def __repr__(self) -> str:
         return (
-            f"Trade(id={self.id!r}, trade_date={self.trade_date!r}, trade_time={self.trade_time!r}, "
-            f"trade_volume={self.trade_volume!r}, ticker_id={self.ticker_id!r})"
+            f"Trade(id={self.id!r}, trade_date={self.trade_date!r}, "
+            f"trade_time={self.trade_time!r}, trade_volume={self.trade_volume!r}, "
+            f"trade_price={self.trade_price!r}, ticker_id={self.ticker_id!r})"
         )
 
 
@@ -102,7 +104,6 @@ class Price(Base):  # type: ignore
     opening_price = db.Column(db.FLOAT(30), nullable=False)
     high_price = db.Column(db.FLOAT(30), nullable=False)
     low_price = db.Column(db.FLOAT(30), nullable=False)
-    trade_price = db.Column(db.FLOAT(30), nullable=False)
     ticker_id = db.Column(
         db.Integer, db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE")
     )
@@ -117,7 +118,7 @@ class Price(Base):  # type: ignore
 
 class Diff(Base):  # type: ignore
     """
-    Diff table class
+    Difference table class
     """
 
     __tablename__ = "diff"
