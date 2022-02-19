@@ -21,10 +21,9 @@ market_code = ["KRW-BTC", "KRW-ETH"]
 
 def get_existing_tickers(stmt: db.sql.Select) -> List[Ticker]:
     """Get existing records from Ticker table"""
-    records = []
     with Session(engine) as session:
         print(f"Columns: {list(session.execute(stmt).keys())}")
-        records = session.execute(stmt).all()
+        records = session.execute(stmt).scalars().all()
         for i, record in enumerate(records):
             print(f"{i}: {record}")
     return records
@@ -36,7 +35,7 @@ def insert_into_ticker_table(code_idx: Dict[str, int]) -> None:
 
     selected_code = set()
     for record in records:
-        selected_code.add(record[0].market_code)
+        selected_code.add(record.market_code)
 
     objects = []
     for key, value in code_idx.items():
