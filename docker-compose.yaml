@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  mariadb:
+  db:
     image: mariadb:10
     restart: always
     container_name: mariadb-server
@@ -25,7 +25,7 @@ services:
     environment:
       TZ: Asia/Seoul
     depends_on:
-      - "mariadb"
+      - "db"
     tty: true
 
     
