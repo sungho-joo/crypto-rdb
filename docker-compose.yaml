@@ -24,8 +24,6 @@ services:
     container_name: upbit-websocket-server
     environment:
       TZ: Asia/Seoul
-    depends_on:
-      - "db"
+    command:
+      bash -c "sleep 10 && python3 ./src/websocket/insert_data.py"
     tty: true
-
-    
