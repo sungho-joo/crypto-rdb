@@ -25,5 +25,5 @@ services:
     environment:
       TZ: Asia/Seoul
     command:
-      bash -c "sleep 10 && python3 ./src/websocket/insert_data.py"
+      bash -c "sleep 20 && python3 ./src/websocket/insert_data.py"
     tty: true
