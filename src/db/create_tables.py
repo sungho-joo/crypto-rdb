@@ -112,7 +112,7 @@ class Price(Base):  # type: ignore
         return (
             f"Price(id={self.id!r}, opening_price={self.opening_price!r},"
             f"high_price={self.high_price!r}, low_price={self.low_price!r}, "
-            f"trade_price={self.trade_price!r}, ticker_id={self.ticker_id!r})"
+            f"ticker_id={self.ticker_id!r})"
         )
 
 

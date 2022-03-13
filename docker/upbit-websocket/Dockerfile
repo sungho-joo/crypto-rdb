@@ -8,4 +8,3 @@ RUN apk add build-base
 RUN apk add --no-cache bash libressl-dev musl-dev libffi-dev
 RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONPATH "${PYTHONPATH}:/usr/app/src"
-CMD ["python3", "./src/websocket/insert_data.py"]
