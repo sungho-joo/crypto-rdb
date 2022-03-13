@@ -9,26 +9,7 @@ Author:
 """
 
 import sqlalchemy as db
-from sqlalchemy.ext.declarative import declarative_base
-
-config = {
-    "host": "db",
-    "user": "root",
-    "port": 3306,
-    "password": 20220201,
-    "database": "crypto-rdb",
-}
-
-db_host = config.get("host")
-db_user = config.get("user")
-db_port = config.get("port")
-db_pwd = config.get("password")
-db_name = config.get("database")
-
-connection_str = f"mariadb+pymysql://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}"
-engine = db.create_engine(connection_str, echo=True, future=True)
-
-Base = declarative_base()
+from database import Base
 
 
 class Ticker(Base):  # type: ignore
@@ -138,8 +119,3 @@ class Diff(Base):  # type: ignore
             f"change_state={self.change_state!r}, change_price={self.change_price!r}, "
             f"change_rate={self.change_rate!r}, ticker_id={self.ticker_id!r})"
         )
-
-
-Base.metadata.create_all(engine)
-
-print(Base.metadata.tables.keys())
