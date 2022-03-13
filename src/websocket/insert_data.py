@@ -22,10 +22,8 @@ market_code = ["KRW-BTC", "KRW-ETH"]
 def get_existing_tickers(stmt: db.sql.Select) -> List[Ticker]:
     """Get existing records from Ticker table"""
     with Session(engine) as session:
-        print(f"Columns: {list(session.execute(stmt).keys())}")
+        print(f"Statement: {stmt}")
         records = session.execute(stmt).scalars().all()
-        for i, record in enumerate(records):
-            print(f"{i}: {record}")
     return records
 
 

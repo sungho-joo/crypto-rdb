@@ -25,9 +25,8 @@ def select_from_tables(stmt: db.sql.Select) -> Dict[int, Tuple[Any, ...]]:
     """Select data from tables"""
     record_dict = {}
     with Session(engine) as session:
-        print(f"Columns: {list(session.execute(stmt).keys())}")
+        print(f"Statement: {stmt}")
         for i, record in enumerate(session.execute(stmt)):
-            print(f"{i}: {record}")
             record_dict[i] = tuple(record)
     return record_dict
 
