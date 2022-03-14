@@ -15,15 +15,18 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - $PWD/docker_space:/var/lib/mysql
+      - $PWD/db_space:/var/lib/mysql
 
   upbit:
     build:
       context: .
-      dockerfile: ./docker/upbit-websocket/Dockerfile
+      dockerfile: ./docker/Dockerfile
     container_name: upbit-websocket-server
     environment:
       TZ: Asia/Seoul
+      PYTHONPATH: ${PYTHONPATH}:/usr/app/src
     command:
-      bash -c "sleep 20 && python3 ./src/websocket/insert_data.py"
+      bash -c "sleep 20 && python3 src/websocket/insert_data.py"
     tty: true
+    volumes:
+      - $PWD/src:/usr/app/src
