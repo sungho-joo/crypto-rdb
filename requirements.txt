@@ -5,3 +5,4 @@ PyMySQL==1.0.2
 pyupbit==0.2.22
 SQLAlchemy==1.4.31
 websockets==9.1
+uvicorn==0.17.5
