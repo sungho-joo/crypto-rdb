@@ -17,9 +17,8 @@ from sqlalchemy.orm import Session
 from src.db.database import Database
 from src.db.tables import Accum, Diff, Price, Ticker, Trade
 
-market_code = ["KRW-BTC", "KRW-ETH"]
 START_DATE = "2022-03-04"
-END_DATE = "2022-03-04"
+END_DATE = "2022-05-04"
 
 
 class TickerDBRepository:
@@ -43,7 +42,7 @@ class TickerDBRepository:
         """Select data from tables"""
         rows = {}
         print(f"Statement: {stmt}")
-        with self.session_factory as session:
+        with self.session_factory() as session:
             results = session.execute(stmt)
             cols = list(results.keys())
             for i, record in enumerate(results):
@@ -60,7 +59,7 @@ class TickerDBRepository:
         stmt = db.select(Ticker.id)
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
 
-    def get_all_data_about_ticker(self, ticker_id: int) -> Dict[str, Any]:
+    def get_all_data_about_ticker(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get all data about a ticker"""
         stmt = (
             db.select(
@@ -88,30 +87,68 @@ class TickerDBRepository:
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
+    def get_trade_prices_about_ticker(
+        self, ticker_id: int
+    ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
+        """Get trade prices about a ticker"""
+        stmt = db.select(Trade.trade_price).where(Trade.ticker_id == ticker_id)
+        rows, cols = self.select_from_tables(stmt)
+        return rows, cols
 
-# if __name__ == "__main__":
-#     stmt = db.select(Ticker.id)
-#     ticker_ids: List[int] = [int(ticker_id[0]) for ticker_id in select_from_tables(stmt).values()]
+    def get_acc_ask_volume_about_ticker(
+        self, ticker_id: int
+    ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
+        """Get accumulated ask volume about a ticker"""
+        stmt = (
+            db.select(Trade.trade_date, Trade.trade_time, Accum.acc_ask_volume)
+            .join(Accum, Trade.id == Accum.id)
+            .where(
+                db.and_(
+                    Trade.ticker_id == ticker_id,
+                    START_DATE <= Trade.trade_date,
+                    Trade.trade_date <= END_DATE,
+                )
+            )
+        )
+        rows, cols = self.select_from_tables(stmt)
+        return rows, cols
 
-#     trade_prices = {}
-#     for ticker_id in ticker_ids:
-#         stmt = db.select(Trade.trade_price).where(Trade.ticker_id == ticker_id)
-#         trade_prices[ticker_id] = select_from_tables(stmt)
+    def get_acc_bid_volume_about_ticker(
+        self, ticker_id: int
+    ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
+        """Get accumulated bid volume about a ticker"""
+        stmt = (
+            db.select(Trade.trade_date, Trade.trade_time, Accum.acc_bid_volume)
+            .join(Accum, Trade.id == Accum.id)
+            .where(
+                db.and_(
+                    Trade.ticker_id == ticker_id,
+                    START_DATE <= Trade.trade_date,
+                    Trade.trade_date <= END_DATE,
+                )
+            )
+        )
+        rows, cols = self.select_from_tables(stmt)
+        return rows, cols
 
-#     print(len(trade_prices[1]))
-#     print(len(trade_prices[2]))
 
-#     acc_bid_volumes = {}
-#     for ticker_id in ticker_ids:
-#         stmt = (
-#             db.select(Trade.trade_date, Trade.trade_time, Accum.acc_bid_volume)
-#             .join(Accum, Trade.id == Accum.id)
-#             .where(
-#                 db.and_(
-#                     Trade.ticker_id == ticker_id,
-#                     START_DATE <= Trade.trade_date,
-#                     Trade.trade_date <= END_DATE,
-#                 )
-#             )
-#         )
-#         acc_bid_volumes[ticker_id] = select_from_tables(stmt)
+if __name__ == "__main__":
+    ticker_db_repository = TickerDBRepository()
+
+    rows, cols = ticker_db_repository.get_all_tickers()
+    # print(rows, cols)
+
+    rows, cols = ticker_db_repository.get_all_ticker_ids()
+    # print(rows, cols)
+
+    rows, cols = ticker_db_repository.get_all_data_about_ticker(1)
+    # print(rows, cols)
+
+    rows, cols = ticker_db_repository.get_trade_prices_about_ticker(1)
+    # print(rows, cols)
+
+    rows, cols = ticker_db_repository.get_acc_ask_volume_about_ticker(1)
+    # print(rows, cols)
+
+    rows, cols = ticker_db_repository.get_acc_bid_volume_about_ticker(1)
+    # print(rows, cols)
