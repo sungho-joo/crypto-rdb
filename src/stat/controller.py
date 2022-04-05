@@ -8,12 +8,13 @@ Author:
     Email:
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from fastapi import APIRouter
-from repository import StatRepository
 
-repository = StatRepository()
+from src.stat.repository import TickerDBRepository
+
+repository = TickerDBRepository()
 
 router = APIRouter(prefix="/stat", tags=["stat"], responses={404: {"description": "Not found"}})
 
@@ -21,14 +22,14 @@ router = APIRouter(prefix="/stat", tags=["stat"], responses={404: {"description"
 @router.get("/tickers")
 def get_tickers():
     """Get all tickers"""
-    tickers = repository.get_tickers()
+    tickers = repository.get_all_tickers()
     return tickers
 
 
 @router.get("/tickers")
-def get_all_stat_data_for_given_tickers(query_params: List[str]):
+def get_all_stat_data_for_given_tickers():
     """Get all data for given tickers"""
-    ticker_ids = repository.get_ticker_ids(query_params)
+    ticker_ids = repository.get_all_ticker_ids()
     ans = []
     for ticker_id in ticker_ids:
         all_stat_data: Dict[str, Any] = repository.get_all_data_about_ticker(ticker_id)

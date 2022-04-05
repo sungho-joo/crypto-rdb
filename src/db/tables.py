@@ -9,7 +9,8 @@ Author:
 """
 
 import sqlalchemy as db
-from database import Base
+
+from src.db.database import Base, Database
 
 
 class Ticker(Base):  # type: ignore
@@ -119,3 +120,6 @@ class Diff(Base):  # type: ignore
             f"change_state={self.change_state!r}, change_price={self.change_price!r}, "
             f"change_rate={self.change_rate!r}, ticker_id={self.ticker_id!r})"
         )
+
+
+Database().create_database()
