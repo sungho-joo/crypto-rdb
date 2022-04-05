@@ -29,7 +29,7 @@ class WebSocket:
         market_code: List[str] = ["KRW-BTC"],
         session_factory: Callable[
             ...,
-            AbstractAsyncContextManager[Session],
+            AbstractAsyncContextManager[Session],  # pylint: disable=unsubscriptable-object
         ] = Database().session,
     ):
         self.market_code = market_code
