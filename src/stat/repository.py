@@ -17,9 +17,6 @@ from sqlalchemy.orm import Session
 from src.db.database import Database
 from src.db.tables import Accum, Diff, Price, Ticker, Trade
 
-START_DATE = "2022-03-04"
-END_DATE = "2022-05-04"
-
 
 class TickerDBRepository:
     """TickerDBRepository"""
@@ -59,7 +56,7 @@ class TickerDBRepository:
         stmt = db.select(Ticker.id)
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
 
-    def get_all_data_about_ticker(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
+    def get_all_data(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get all data about a ticker"""
         stmt = (
             db.select(
@@ -87,16 +84,17 @@ class TickerDBRepository:
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
-    def get_trade_prices_about_ticker(
-        self, ticker_id: int
-    ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
+    def get_trade_prices(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get trade prices about a ticker"""
         stmt = db.select(Trade.trade_price).where(Trade.ticker_id == ticker_id)
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
-    def get_acc_ask_volume_about_ticker(
-        self, ticker_id: int
+    def get_acc_ask_volume(
+        self,
+        ticker_id: int,
+        start_date: str,
+        end_date: str,
     ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get accumulated ask volume about a ticker"""
         stmt = (
@@ -105,16 +103,19 @@ class TickerDBRepository:
             .where(
                 db.and_(
                     Trade.ticker_id == ticker_id,
-                    START_DATE <= Trade.trade_date,
-                    Trade.trade_date <= END_DATE,
+                    start_date <= Trade.trade_date,
+                    Trade.trade_date <= end_date,
                 )
             )
         )
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
-    def get_acc_bid_volume_about_ticker(
-        self, ticker_id: int
+    def get_acc_bid_volume(
+        self,
+        ticker_id: int,
+        start_date: str,
+        end_date: str,
     ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get accumulated bid volume about a ticker"""
         stmt = (
@@ -123,8 +124,8 @@ class TickerDBRepository:
             .where(
                 db.and_(
                     Trade.ticker_id == ticker_id,
-                    START_DATE <= Trade.trade_date,
-                    Trade.trade_date <= END_DATE,
+                    start_date <= Trade.trade_date,
+                    Trade.trade_date <= end_date,
                 )
             )
         )
@@ -141,14 +142,17 @@ if __name__ == "__main__":
     rows, cols = ticker_db_repository.get_all_ticker_ids()
     # print(rows, cols)
 
-    rows, cols = ticker_db_repository.get_all_data_about_ticker(1)
+    rows, cols = ticker_db_repository.get_all_data(1)
     # print(rows, cols)
 
-    rows, cols = ticker_db_repository.get_trade_prices_about_ticker(1)
+    rows, cols = ticker_db_repository.get_trade_prices(1)
     # print(rows, cols)
 
-    rows, cols = ticker_db_repository.get_acc_ask_volume_about_ticker(1)
+    START_DATE = "2022-03-04"
+    END_DATE = "2022-05-04"
+
+    rows, cols = ticker_db_repository.get_acc_ask_volume(1, START_DATE, END_DATE)
     # print(rows, cols)
 
-    rows, cols = ticker_db_repository.get_acc_bid_volume_about_ticker(1)
+    rows, cols = ticker_db_repository.get_acc_bid_volume(1, START_DATE, END_DATE)
     # print(rows, cols)

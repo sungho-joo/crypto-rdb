@@ -19,6 +19,8 @@ from sqlalchemy.orm import Session
 from src.db.database import Database
 from src.db.tables import Accum, Diff, Price, Ticker, Trade
 
+Database().create_database()
+
 
 class WebSocket:
     """Websocket wrapper Class"""
