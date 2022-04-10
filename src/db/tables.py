@@ -10,7 +10,7 @@ Author:
 
 import sqlalchemy as db
 
-from src.db.database import Base
+from db.database import Base
 
 
 class Ticker(Base):  # type: ignore

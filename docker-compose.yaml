@@ -22,6 +22,8 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile
     container_name: upbit-websocket-server
+    ports:
+      - "7777:7777"
     environment:
       TZ: Asia/Seoul
       PYTHONPATH: ${PYTHONPATH}:/usr/app/src

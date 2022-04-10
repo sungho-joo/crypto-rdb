@@ -14,8 +14,8 @@ from typing import Any, Callable, Dict, List, Tuple
 import sqlalchemy as db
 from sqlalchemy.orm import Session
 
-from src.db.database import Database
-from src.db.tables import Accum, Diff, Price, Ticker, Trade
+from db.database import Database
+from db.tables import Accum, Diff, Price, Ticker, Trade
 
 
 class TickerDBRepository:
