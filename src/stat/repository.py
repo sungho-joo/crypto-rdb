@@ -52,7 +52,7 @@ class TickerDBRepository:
         return [ticker[0] for ticker in self.select_from_tables(stmt)[0].values()]
 
     def get_all_market_ids(self) -> List[int]:
-        """Get all ids from ticker table"""
+        """Get all market ids from ticker table"""
         stmt = db.select(Ticker.id)
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
 
@@ -62,7 +62,7 @@ class TickerDBRepository:
         return [ticker[0] for ticker in self.select_from_tables(stmt)[0].values()]
 
     def get_some_market_ids(self, codes: List[str]) -> List[int]:
-        """Get some ids from ticker table"""
+        """Get some market ids from ticker table"""
         stmt = db.select(Ticker.id, Ticker.id.in_(codes))
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
 
