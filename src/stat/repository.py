@@ -46,14 +46,24 @@ class TickerDBRepository:
                 rows[i] = tuple(record)
         return rows, cols
 
-    def get_all_tickers(self) -> List[str]:
-        """Get all tickers"""
+    def get_all_market_codes(self) -> List[str]:
+        """Get all market codes from ticker table"""
         stmt = db.select(Ticker.market_code)
         return [ticker[0] for ticker in self.select_from_tables(stmt)[0].values()]
 
-    def get_all_ticker_ids(self) -> List[int]:
-        """Get all ticker ids"""
+    def get_all_market_ids(self) -> List[int]:
+        """Get all ids from ticker table"""
         stmt = db.select(Ticker.id)
+        return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
+
+    def get_some_market_codes(self, ids: List[int]) -> List[str]:
+        """Get some market codes from ticker table"""
+        stmt = db.select(Ticker.market_code, Ticker.market_code.in_(ids))
+        return [ticker[0] for ticker in self.select_from_tables(stmt)[0].values()]
+
+    def get_some_market_ids(self, codes: List[str]) -> List[int]:
+        """Get some ids from ticker table"""
+        stmt = db.select(Ticker.id, Ticker.id.in_(codes))
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
 
     def get_all_data(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
@@ -136,23 +146,39 @@ class TickerDBRepository:
 if __name__ == "__main__":
     ticker_db_repository = TickerDBRepository()
 
-    rows, cols = ticker_db_repository.get_all_tickers()
-    # print(rows, cols)
+    # Test 1: get_all_market_codes()
+    codes = ticker_db_repository.get_all_market_codes()
+    # print(codes)
 
-    rows, cols = ticker_db_repository.get_all_ticker_ids()
-    # print(rows, cols)
+    # Test 2: get_all_market_ids()
+    ids = ticker_db_repository.get_all_market_ids()
+    # print(ids)
 
+    # Test 3: get_some_market_codes()
+    market_codes = ["KRW-BTC", "KRW-ETH"]
+    codes = ticker_db_repository.get_some_market_codes(market_codes)
+    # print(codes)
+
+    # Test 4: get_some_market_ids()
+    market_ids = [1, 2]
+    ids = ticker_db_repository.get_some_market_ids(market_ids)
+    # print(ids)
+
+    # Test 5: get_all_data()
     rows, cols = ticker_db_repository.get_all_data(1)
     # print(rows, cols)
 
+    # Test 6: get_trade_prices()
     rows, cols = ticker_db_repository.get_trade_prices(1)
     # print(rows, cols)
 
     START_DATE = "2022-03-04"
     END_DATE = "2022-05-04"
 
+    # Test 7: get_acc_ask_volume()
     rows, cols = ticker_db_repository.get_acc_ask_volume(1, START_DATE, END_DATE)
     # print(rows, cols)
 
+    # Test 8: get_acc_bid_volume()
     rows, cols = ticker_db_repository.get_acc_bid_volume(1, START_DATE, END_DATE)
     # print(rows, cols)
