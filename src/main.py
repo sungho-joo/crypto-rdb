@@ -8,10 +8,11 @@ from fastapi import FastAPI
 from db.database import Database
 from src.stat import controller as stat_controller
 
+
 def create_app() -> FastAPI:
     """Create and do initial configuration of fastapi app"""
 
-#    db = Database()
+    #    db = Database()
     # try:
     #     db.create_database()
     # except Exception:  # pylint: disable=broad-except

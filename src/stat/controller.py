@@ -8,7 +8,7 @@ Author:
     Email:
 """
 
-from typing import Any, Dict, Tuple, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from fastapi import APIRouter, Query
 
@@ -36,6 +36,7 @@ def get_all_stat_data_for_given_tickers():
         ans.append(all_stat_data)
     return ans
 
+
 @router.get("/price/")
 def get_current_price(query_param: Optional[List[str]] = None):
     if not query_param:
@@ -49,7 +50,7 @@ def get_current_price(query_param: Optional[List[str]] = None):
     return ans
 
 
-@rouger.get("/ask/accumulation/{start_date}-{end_date}")
+@router.get("/ask/accumulation/{start_date}-{end_date}")
 def get_ask_accumlation_range(start_date: str, end_date: str, query_param: Optional[List[str]] = None):
     if not query_param:
         ticker_ids = repository.get_all_ticker_ids()
@@ -63,7 +64,7 @@ def get_ask_accumlation_range(start_date: str, end_date: str, query_param: Optio
     return ans
 
 
-@rouger.get("/bid/accumulation/{start_date}-{end_date}")
+@router.get("/bid/accumulation/{start_date}-{end_date}")
 def get_bid_accumlation_range(start_date: str, end_date: str, query_param: Optional[List[str]] = None):
     if not query_param:
         ticker_ids = repository.get_all_ticker_ids()
@@ -75,4 +76,3 @@ def get_bid_accumlation_range(start_date: str, end_date: str, query_param: Optio
         price, _ = repository.get_acc_bid_volume(ticker_id, start_date, end_date)
         ans.append(price)
     return ans
-

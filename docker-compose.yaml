@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: mariadb-server
     ports:
-      - 5555:3306
+      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: 20220201
       MYSQL_DATABASE: crypto-rdb
@@ -28,7 +28,23 @@ services:
       TZ: Asia/Seoul
       PYTHONPATH: ${PYTHONPATH}:/usr/app/src
     command:
-      bash -c "sleep 20 && python3 src/websocket/insert_data.py"
+      bash -c "sleep 30 && python src/websocket/insert_data.py"
+    tty: true
+    volumes:
+      - $PWD/src:/usr/app/src
+
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: fastapi-server
+    ports:
+      - "8888:8888"
+    environment:
+      TZ: Asia/Seoul
+      PYTHONPATH: ${PYTHONPATH}:/usr/app/src
+    command:
+      bash -c "PYTHONPATH=src/ uvicorn src.main:app --host=0.0.0.0 --port 8888 --reload"
     tty: true
     volumes:
       - $PWD/src:/usr/app/src
