@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
-TBU
+API functions based on FastAPI
 
 Author:
-    Name:
-    Email:
+    Name: Sungho Joo
+    Email: triangle124@gmail.com
 """
 
 from typing import Any, Dict, List, Optional, Tuple
@@ -46,6 +46,7 @@ def get_all_stat_data_for_given_tickers(
 def get_current_price(
     query_params: Optional[List[str]] = Query(None, description="List of market code")
 ):
+    """Get price for given market code"""
     if not query_params:
         ticker_ids = repository.get_all_market_ids()
     else:
@@ -63,6 +64,8 @@ def get_ask_accumlation_range(
     end_date: str,
     query_params: Optional[List[str]] = Query(None, description="List of market code"),
 ):
+    """Get ask accumulation for given time period for given market code"""
+
     if not query_params:
         ticker_ids = repository.get_all_market_ids()
     else:
@@ -81,6 +84,8 @@ def get_bid_accumlation_range(
     end_date: str,
     query_params: Optional[List[str]] = Query(None, description="List of market code"),
 ):
+    """Get bid accumulation for given time period for given market code"""
+
     if not query_params:
         ticker_ids = repository.get_all_market_ids()
     else:

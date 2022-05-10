@@ -1,6 +1,7 @@
 """Main function initializing fastapi app"""
 
 from fastapi import FastAPI
+
 from src.stat import controller as stat_controller
 
 
