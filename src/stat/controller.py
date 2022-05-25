@@ -13,17 +13,18 @@ from typing import Any, Dict, List, Optional, Tuple
 from fastapi import APIRouter, Query
 
 from .repository import TickerDBRepository
+from .schema import StatGetOut, StatsGetOut, TickersGetOut
 
 repository = TickerDBRepository()
 
 router = APIRouter(prefix="/stat", tags=["stat"], responses={404: {"description": "Not found"}})
 
 
-@router.get("/tickers")
-def get_tickers():
+@router.get("/tickers", response_model=TickersGetOut)
+def get_tickers() -> TickersGetOut:
     """Get all tickers"""
     tickers = repository.get_all_market_codes()
-    return tickers
+    return TickersGetOut(ticker_list=tickers)
 
 
 @router.get("/")
@@ -42,20 +43,20 @@ def get_all_stat_data_for_given_tickers(
     return ans
 
 
-@router.get("/price/")
+@router.get("/price/", response_model=StatsGetOut)
 def get_current_price(
     query_params: Optional[List[str]] = Query(None, description="List of market code")
-):
+) -> StatsGetOut:
     """Get price for given market code"""
     if not query_params:
         ticker_ids = repository.get_all_market_ids()
     else:
         ticker_ids = repository.get_some_market_ids(query_params)
-    ans = []
+    price_list = []
     for ticker_id in ticker_ids:
-        price, _ = repository.get_trade_prices(ticker_id)
-        ans.append(price)
-    return ans
+        price, cols = repository.get_trade_prices(ticker_id)
+        price_list.append(StatGetOut(stat_name=cols[0], value=price))
+    return StatsGetOut(stats=price_list)
 
 
 @router.get("/ask/accumulation/{start_date}-{end_date}")
@@ -73,8 +74,8 @@ def get_ask_accumlation_range(
 
     ans = []
     for ticker_id in ticker_ids:
-        price, _ = repository.get_acc_ask_volume(ticker_id, start_date, end_date)
-        ans.append(price)
+        price, cols = repository.get_acc_ask_volume(ticker_id, start_date, end_date)
+        ans.extend([price, cols])
     return ans
 
 
@@ -93,6 +94,6 @@ def get_bid_accumlation_range(
 
     ans = []
     for ticker_id in ticker_ids:
-        price, _ = repository.get_acc_bid_volume(ticker_id, start_date, end_date)
-        ans.append(price)
+        price, cols = repository.get_acc_bid_volume(ticker_id, start_date, end_date)
+        ans.extend([price, cols])
     return ans
