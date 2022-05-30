@@ -8,6 +8,7 @@ Author:
     Email: kid33629@gmail.com
 """
 
+import datetime
 from contextlib import AbstractContextManager
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -95,17 +96,22 @@ class TickerDBRepository:
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
-    def get_trade_prices(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
+    def get_price_ranges(
+        self, ticker_id: int, start_date: datetime.date, end_date: datetime.date
+    ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get trade prices about a ticker"""
-        stmt = db.select(Trade.trade_price).where(Trade.ticker_id == ticker_id)
+        stmt = db.select(Trade.trade_price).where(
+            db.and_(
+                Trade.ticker_id == ticker_id,
+                start_date <= Trade.trade_date,
+                Trade.trade_date <= end_date,
+            )
+        )
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
-    def get_acc_ask_volume(
-        self,
-        ticker_id: int,
-        start_date: str,
-        end_date: str,
+    def get_ask_acc_volume(
+        self, ticker_id: int, start_date: datetime.date, end_date: datetime.date
     ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get accumulated ask volume about a ticker"""
         stmt = (
@@ -123,10 +129,7 @@ class TickerDBRepository:
         return rows, cols
 
     def get_acc_bid_volume(
-        self,
-        ticker_id: int,
-        start_date: str,
-        end_date: str,
+        self, ticker_id: int, start_date: datetime.date, end_date: datetime.date
     ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get accumulated bid volume about a ticker"""
         stmt = (

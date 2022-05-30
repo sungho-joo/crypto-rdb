@@ -8,12 +8,12 @@ Author:
     Email: triangle124@gmail.com
 """
 
-from typing import Any, Dict, List, Optional, Tuple
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 
 from .repository import TickerDBRepository
-from .schema import StatGetOut, StatsGetOut, TickersGetOut
+from .schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
+from .utils import check_date_valid
 
 repository = TickerDBRepository()
 
@@ -27,73 +27,72 @@ def get_tickers() -> TickersGetOut:
     return TickersGetOut(ticker_list=tickers)
 
 
-@router.get("/")
-def get_all_stat_data_for_given_tickers(
-    query_params: Optional[List[str]] = Query(None, description="List of market code")
-):
-    """Get all data for given tickers"""
-    if not query_params:
-        ticker_ids = repository.get_all_market_ids()
-    else:
-        ticker_ids = repository.get_some_market_ids(query_params)
-    ans = []
-    for ticker_id in ticker_ids:
-        all_stat_data: Tuple[Dict[int, Tuple[Any, ...]], List[str]] = repository.get_all_data(ticker_id)
-        ans.append(all_stat_data)
-    return ans
-
-
-@router.get("/price/", response_model=StatsGetOut)
-def get_current_price(
-    query_params: Optional[List[str]] = Query(None, description="List of market code")
+@router.post("/price/", response_model=StatsGetOut)
+def get_price_ranges(
+    request_body: StatGetIn,
 ) -> StatsGetOut:
     """Get price for given market code"""
-    if not query_params:
+    market_code = request_body.market_code
+    start_date = request_body.start_date
+    end_date = request_body.end_date
+
+    if not market_code:
         ticker_ids = repository.get_all_market_ids()
     else:
-        ticker_ids = repository.get_some_market_ids(query_params)
+        ticker_ids = repository.get_some_market_ids(market_code)
+
+    check_date_valid(start_date, end_date)
+
     price_list = []
-    for ticker_id in ticker_ids:
-        price, cols = repository.get_trade_prices(ticker_id)
-        price_list.append(StatGetOut(stat_name=cols[0], value=price))
+    for i, ticker_id in enumerate(ticker_ids):
+        price, cols = repository.get_price_ranges(ticker_id, start_date, end_date)
+        price_list.append(StatGetOut(stat_name=cols[0], value=price, market_code=market_code[i]))
     return StatsGetOut(stats=price_list)
 
 
-@router.get("/ask/accumulation/{start_date}-{end_date}")
+@router.post("/ask/accumulation/", response_model=StatsGetOut)
 def get_ask_accumlation_range(
-    start_date: str,
-    end_date: str,
-    query_params: Optional[List[str]] = Query(None, description="List of market code"),
-):
+    request_body: StatGetIn,
+) -> StatsGetOut:
     """Get ask accumulation for given time period for given market code"""
+    market_code = request_body.market_code
+    start_date = request_body.start_date
+    end_date = request_body.end_date
 
-    if not query_params:
+    if not market_code:
         ticker_ids = repository.get_all_market_ids()
     else:
-        ticker_ids = repository.get_some_market_ids(query_params)
+        ticker_ids = repository.get_some_market_ids(market_code)
 
-    ans = []
-    for ticker_id in ticker_ids:
-        price, cols = repository.get_acc_ask_volume(ticker_id, start_date, end_date)
-        ans.extend([price, cols])
-    return ans
+    check_date_valid(start_date, end_date)
+
+    ask_accum_list = []
+    for i, ticker_id in enumerate(ticker_ids):
+        ask_acc, cols = repository.get_ask_acc_volume(ticker_id, start_date, end_date)
+        ask_accum_list.append(StatGetOut(stat_name=cols[0], value=ask_acc, market_code=market_code[i]))
+    return StatsGetOut(stats=ask_accum_list)
 
 
-@router.get("/bid/accumulation/{start_date}-{end_date}")
+@router.post("/bid/accumulation/", response_model=StatsGetOut)
 def get_bid_accumlation_range(
-    start_date: str,
-    end_date: str,
-    query_params: Optional[List[str]] = Query(None, description="List of market code"),
-):
+    request_body: StatGetIn,
+) -> StatsGetOut:
     """Get bid accumulation for given time period for given market code"""
+    market_code = request_body.market_code
+    start_date = request_body.start_date
+    end_date = request_body.end_date
 
-    if not query_params:
+    if not market_code:
         ticker_ids = repository.get_all_market_ids()
     else:
-        ticker_ids = repository.get_some_market_ids(query_params)
+        ticker_ids = repository.get_some_market_ids(market_code)
 
-    ans = []
-    for ticker_id in ticker_ids:
-        price, cols = repository.get_acc_bid_volume(ticker_id, start_date, end_date)
-        ans.extend([price, cols])
-    return ans
+    check_date_valid(start_date, end_date)
+
+    bid_accum_list = []
+    for i, ticker_id in enumerate(ticker_ids):
+        bid_accum, cols = repository.get_acc_bid_volume(ticker_id, start_date, end_date)
+        bid_accum_list.append(
+            StatGetOut(stat_name=cols[0], value=bid_accum, market_code=market_code[i])
+        )
+    return StatsGetOut(stats=bid_accum_list)
