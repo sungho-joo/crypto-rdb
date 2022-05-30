@@ -15,8 +15,6 @@ from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
-from src.common.singleton import singleton
-
 config = {
     "host": "db",
     "user": "root",
@@ -35,7 +33,6 @@ CONNECTION_URL = f"mariadb+pymysql://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_
 Base = declarative_base()
 
 
-@singleton
 class Database:
     """Database"""
 

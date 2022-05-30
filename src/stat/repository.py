@@ -14,8 +14,8 @@ from typing import Any, Callable, Dict, List, Tuple
 import sqlalchemy as db
 from sqlalchemy.orm import Session
 
-from src.db.database import Database
-from src.db.tables import Accum, Diff, Price, Ticker, Trade
+from db.database import Database
+from db.tables import Accum, Diff, Price, Ticker, Trade
 
 
 class TickerDBRepository:
@@ -44,6 +44,7 @@ class TickerDBRepository:
             cols = list(results.keys())
             for i, record in enumerate(results):
                 rows[i] = tuple(record)
+
         return rows, cols
 
     def get_all_market_codes(self) -> List[str]:
@@ -63,7 +64,7 @@ class TickerDBRepository:
 
     def get_some_market_ids(self, codes: List[str]) -> List[int]:
         """Get some market ids from ticker table"""
-        stmt = db.select(Ticker.id, Ticker.id.in_(codes))
+        stmt = db.select(Ticker.id).where(Ticker.market_code.in_(codes))
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
 
     def get_all_data(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
