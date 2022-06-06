@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# mypy: ignore-errors
 
 """
 Creation for tables related to crypto using SQLAlchemy ORM

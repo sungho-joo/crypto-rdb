@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# mypy: ignore-errors
+
 """single class decorator"""
 
 
@@ -8,7 +11,7 @@ def singleton(class_: object) -> object:
         """Add singleton functionality"""
 
         _instance = None
-        _sealed = False
+        _sealed = None
 
         def __new__(cls, *args, **kwargs):  # pylint: disable=unused-argument
             """Check if this class is already instantiated"""

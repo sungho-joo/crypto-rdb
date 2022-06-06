@@ -30,11 +30,6 @@ class TickerDBRepository:
     ) -> None:
         self.session_factory = session_factory
 
-    @classmethod
-    def get_attributes(cls):
-        """Get attributes of a class"""
-        return [i for i in cls.__dict__ if i[:1] != "_"]
-
     def select_from_tables(self, stmt: db.sql.Select) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Select data from tables"""
         rows = {}
@@ -44,25 +39,24 @@ class TickerDBRepository:
             cols = list(results.keys())
             for i, record in enumerate(results):
                 rows[i] = tuple(record)
-
         return rows, cols
 
     def get_all_market_codes(self) -> List[str]:
         """Get all market codes from ticker table"""
         stmt = db.select(Ticker.market_code)
-        return [ticker[0] for ticker in self.select_from_tables(stmt)[0].values()]
+        return [ticker_name[0] for ticker_name in self.select_from_tables(stmt)[0].values()]
 
     def get_all_market_ids(self) -> List[int]:
         """Get all market ids from ticker table"""
         stmt = db.select(Ticker.id)
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
 
-    def get_some_market_codes(self, ids: List[int]) -> List[str]:
+    def get_some_market_codes(self, ids: List[str]) -> List[str]:
         """Get some market codes from ticker table"""
         stmt = db.select(Ticker.market_code, Ticker.market_code.in_(ids))
         return [ticker[0] for ticker in self.select_from_tables(stmt)[0].values()]
 
-    def get_some_market_ids(self, codes: List[str]) -> List[int]:
+    def get_some_market_ids(self, codes: List[int]) -> List[int]:
         """Get some market ids from ticker table"""
         stmt = db.select(Ticker.id).where(Ticker.market_code.in_(codes))
         return [ticker_id[0] for ticker_id in self.select_from_tables(stmt)[0].values()]
@@ -116,7 +110,7 @@ class TickerDBRepository:
                     Trade.ticker_id == ticker_id,
                     start_date <= Trade.trade_date,
                     Trade.trade_date <= end_date,
-                )
+                ),
             )
         )
         rows, cols = self.select_from_tables(stmt)
@@ -137,7 +131,7 @@ class TickerDBRepository:
                     Trade.ticker_id == ticker_id,
                     start_date <= Trade.trade_date,
                     Trade.trade_date <= end_date,
-                )
+                ),
             )
         )
         rows, cols = self.select_from_tables(stmt)

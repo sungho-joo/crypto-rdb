@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# mypy: ignore-errors
 
 """
 API functions based on FastAPI
@@ -8,12 +9,11 @@ Author:
     Email: triangle124@gmail.com
 """
 
+from stat.repository import TickerDBRepository
+from stat.schema import StatGetOut, StatsGetOut, TickersGetOut
 from typing import Any, Dict, List, Optional, Tuple
 
 from fastapi import APIRouter, Query
-
-from .repository import TickerDBRepository
-from .schema import StatGetOut, StatsGetOut, TickersGetOut
 
 repository = TickerDBRepository()
 
@@ -29,8 +29,8 @@ def get_tickers() -> TickersGetOut:
 
 @router.get("/")
 def get_all_stat_data_for_given_tickers(
-    query_params: Optional[List[str]] = Query(None, description="List of market code")
-):
+    query_params: Optional[List[str]] = Query(None, description="List of market code"),
+) -> StatsGetOut:
     """Get all data for given tickers"""
     if not query_params:
         ticker_ids = repository.get_all_market_ids()
@@ -45,7 +45,7 @@ def get_all_stat_data_for_given_tickers(
 
 @router.get("/price/", response_model=StatsGetOut)
 def get_current_price(
-    query_params: Optional[List[str]] = Query(None, description="List of market code")
+    query_params: Optional[List[str]] = Query(None, description="List of market code"),
 ) -> StatsGetOut:
     """Get price for given market code"""
     if not query_params:
@@ -64,7 +64,7 @@ def get_ask_accumlation_range(
     start_date: str,
     end_date: str,
     query_params: Optional[List[str]] = Query(None, description="List of market code"),
-):
+) -> StatsGetOut:
     """Get ask accumulation for given time period for given market code"""
 
     if not query_params:
@@ -84,7 +84,7 @@ def get_bid_accumlation_range(
     start_date: str,
     end_date: str,
     query_params: Optional[List[str]] = Query(None, description="List of market code"),
-):
+) -> StatsGetOut:
     """Get bid accumulation for given time period for given market code"""
 
     if not query_params:
