@@ -17,8 +17,8 @@ import sqlalchemy as db
 from pyupbit import WebSocketManager
 from sqlalchemy.orm import Session
 
-from db.database import Database
-from db.tables import Accum, Diff, Price, Ticker, Trade
+from crypto.db.database import Database
+from crypto.db.tables import Accum, Diff, Price, Ticker, Trade
 
 Database().create_database()
 

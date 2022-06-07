@@ -10,7 +10,7 @@ Author:
 
 import sqlalchemy as db
 
-from db.database import Base
+from crypto.db.database import Base
 
 
 class Ticker(Base):  # pylint: disable=too-few-public-methods

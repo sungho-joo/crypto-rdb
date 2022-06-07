@@ -1,8 +1,14 @@
 """Main function initializing fastapi app"""
 
-import stat.controller as stat_controller
+import os
+from pathlib import Path
 
 from fastapi import FastAPI
+
+import crypto.stat.controller as stat_controller
+
+main_path = Path(os.path.abspath(__file__))
+os.chdir(main_path.parent)
 
 
 def create_app() -> FastAPI:

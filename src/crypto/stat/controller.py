@@ -9,11 +9,11 @@ Author:
     Email: triangle124@gmail.com
 """
 
-from stat.repository import TickerDBRepository
-from stat.schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
-from stat.utils import check_date_valid
-
 from fastapi import APIRouter
+
+from crypto.stat.repository import TickerDBRepository
+from crypto.stat.schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
+from crypto.stat.utils import check_date_valid
 
 repository = TickerDBRepository()
 
