@@ -17,9 +17,9 @@ from sqlalchemy.orm import Session
 
 config = {
     "host": "db",
-    "user": "root",
-    "port": 3306,
-    "password": 20220201,
+    "user": "crypto",
+    "port": 5432,
+    "password": "crypto",
     "database": "crypto-rdb",
 }
 
@@ -29,7 +29,7 @@ db_port = config.get("port")
 db_pwd = config.get("password")
 db_name = config.get("database")
 
-CONNECTION_URL = f"mariadb+pymysql://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}"
+CONNECTION_URL = f"postgresql+psycopg2://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}"
 Base = declarative_base()
 
 
