@@ -48,5 +48,5 @@ class StatGetIn(BaseModel):
                 "market_code": ["KRW-BTC"],
                 "start_date": "2022-03-18",
                 "end_date": "2022-04-19",
-            }
+            },
         }
