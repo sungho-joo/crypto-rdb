@@ -2,20 +2,23 @@ version: "3"
 
 services:
   db:
-    image: mariadb:10
-    restart: always
-    container_name: mariadb-server
-    ports:
-      - 3306:3306
+    image: postgres:14.0
+    container_name: postgres-server
     environment:
-      MYSQL_ROOT_PASSWORD: 20220201
-      MYSQL_DATABASE: crypto-rdb
+      POSTGRES_USER: crypto
+      POSTGRES_PASSWORD: crypto
+      POSTGRES_DB: crypto-rdb
       TZ: Asia/Seoul
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 5432:5432
+    restart: unless-stopped
     volumes:
-      - $PWD/db_space:/var/lib/mysql
+      - $PWD/db_space:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-U", "crypto", "-d", "crypto-rdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   upbit:
     build:
@@ -28,10 +31,13 @@ services:
       TZ: Asia/Seoul
       PYTHONPATH: ${PYTHONPATH}:/usr/app/src
     command:
-      bash -c "sleep 30 && python src/websocket/insert_data.py"
+      bash -c "python src/websocket/insert_data.py"
     tty: true
     volumes:
       - $PWD/src:/usr/app/src
+    depends_on:
+      db:
+        condition: service_healthy
 
   api:
     build:
@@ -48,3 +54,6 @@ services:
     tty: true
     volumes:
       - $PWD/src:/usr/app/src
+    depends_on:
+      db:
+        condition: service_healthy

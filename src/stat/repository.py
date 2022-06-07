@@ -8,6 +8,7 @@ Author:
     Email: kid33629@gmail.com
 """
 
+import datetime
 from contextlib import AbstractContextManager
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -89,17 +90,28 @@ class TickerDBRepository:
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
-    def get_trade_prices(self, ticker_id: int) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
+    def get_price_ranges(
+        self,
+        ticker_id: int,
+        start_date: datetime.date,
+        end_date: datetime.date,
+    ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get trade prices about a ticker"""
-        stmt = db.select(Trade.trade_price).where(Trade.ticker_id == ticker_id)
+        stmt = db.select(Trade.trade_price).where(
+            db.and_(
+                Trade.ticker_id == ticker_id,
+                start_date <= Trade.trade_date,
+                Trade.trade_date <= end_date,
+            ),
+        )
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
 
     def get_acc_ask_volume(
         self,
         ticker_id: int,
-        start_date: str,
-        end_date: str,
+        start_date: datetime.date,
+        end_date: datetime.date,
     ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get accumulated ask volume about a ticker"""
         stmt = (
@@ -119,8 +131,8 @@ class TickerDBRepository:
     def get_acc_bid_volume(
         self,
         ticker_id: int,
-        start_date: str,
-        end_date: str,
+        start_date: datetime.date,
+        end_date: datetime.date,
     ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get accumulated bid volume about a ticker"""
         stmt = (
@@ -136,44 +148,3 @@ class TickerDBRepository:
         )
         rows, cols = self.select_from_tables(stmt)
         return rows, cols
-
-
-if __name__ == "__main__":
-    ticker_db_repository = TickerDBRepository()
-
-    # Test 1: get_all_market_codes()
-    codes = ticker_db_repository.get_all_market_codes()
-    # print(codes)
-
-    # Test 2: get_all_market_ids()
-    ids = ticker_db_repository.get_all_market_ids()
-    # print(ids)
-
-    # Test 3: get_some_market_codes()
-    market_codes = ["KRW-BTC", "KRW-ETH"]
-    codes = ticker_db_repository.get_some_market_codes(market_codes)
-    # print(codes)
-
-    # Test 4: get_some_market_ids()
-    market_ids = [1, 2]
-    ids = ticker_db_repository.get_some_market_ids(market_ids)
-    # print(ids)
-
-    # Test 5: get_all_data()
-    rows, cols = ticker_db_repository.get_all_data(1)
-    # print(rows, cols)
-
-    # Test 6: get_trade_prices()
-    rows, cols = ticker_db_repository.get_trade_prices(1)
-    # print(rows, cols)
-
-    START_DATE = "2022-03-04"
-    END_DATE = "2022-05-04"
-
-    # Test 7: get_acc_ask_volume()
-    rows, cols = ticker_db_repository.get_acc_ask_volume(1, START_DATE, END_DATE)
-    # print(rows, cols)
-
-    # Test 8: get_acc_bid_volume()
-    rows, cols = ticker_db_repository.get_acc_bid_volume(1, START_DATE, END_DATE)
-    # print(rows, cols)
