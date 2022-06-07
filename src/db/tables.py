@@ -13,7 +13,7 @@ import sqlalchemy as db
 from db.database import Base
 
 
-class Ticker(Base):  # type: ignore
+class Ticker(Base):  # pylint: disable=too-few-public-methods
     """
     Ticker table class
     """
@@ -27,7 +27,7 @@ class Ticker(Base):  # type: ignore
         return f"Ticker(id={self.id!r}, market_code={self.market_code!r})"
 
 
-class Trade(Base):  # type: ignore
+class Trade(Base):  # pylint: disable=too-few-public-methods
     """
     Trade table class
     """
@@ -40,7 +40,8 @@ class Trade(Base):  # type: ignore
     trade_volume = db.Column(db.FLOAT(30), nullable=False)
     trade_price = db.Column(db.FLOAT(30), nullable=False)
     ticker_id = db.Column(
-        db.Integer, db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE")
+        db.Integer,
+        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:
@@ -51,7 +52,7 @@ class Trade(Base):  # type: ignore
         )
 
 
-class Accum(Base):  # type: ignore
+class Accum(Base):  # pylint: disable=too-few-public-methods
     """
     Accumulation table class
     """
@@ -64,7 +65,8 @@ class Accum(Base):  # type: ignore
     acc_trade_volume = db.Column(db.FLOAT(30), nullable=False)
     acc_trade_price = db.Column(db.FLOAT(30), nullable=False)
     ticker_id = db.Column(
-        db.Integer, db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE")
+        db.Integer,
+        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:
@@ -75,7 +77,7 @@ class Accum(Base):  # type: ignore
         )
 
 
-class Price(Base):  # type: ignore
+class Price(Base):  # pylint: disable=too-few-public-methods
     """
     Price table class
     """
@@ -87,7 +89,8 @@ class Price(Base):  # type: ignore
     high_price = db.Column(db.FLOAT(30), nullable=False)
     low_price = db.Column(db.FLOAT(30), nullable=False)
     ticker_id = db.Column(
-        db.Integer, db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE")
+        db.Integer,
+        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:
@@ -98,7 +101,7 @@ class Price(Base):  # type: ignore
         )
 
 
-class Diff(Base):  # type: ignore
+class Diff(Base):  # pylint: disable=too-few-public-methods
     """
     Difference table class
     """
@@ -111,7 +114,8 @@ class Diff(Base):  # type: ignore
     change_price = db.Column(db.FLOAT(30), nullable=False)
     change_rate = db.Column(db.FLOAT(30), nullable=False)
     ticker_id = db.Column(
-        db.Integer, db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE")
+        db.Integer,
+        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:

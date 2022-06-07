@@ -18,7 +18,7 @@ services:
       test: ["CMD", "pg_isready", "-q", "-U", "crypto", "-d", "crypto-rdb"]
       interval: 10s
       timeout: 5s
-      retries: 5  
+      retries: 5
 
   upbit:
     build:

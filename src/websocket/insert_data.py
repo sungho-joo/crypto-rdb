@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# mypy: ignore-errors
 
 """
 Data insertion into tables related to crypto using SQLAlchemy ORM
@@ -115,7 +116,8 @@ if __name__ == "__main__":
     all_tickers = pyupbit.get_tickers()
     market_code = ["KRW-BTC", "KRW-ETH"]
     websocket = WebSocket(
-        ext_websocket=WebSocketManager("ticker", market_code), market_code=market_code
+        ext_websocket=WebSocketManager("ticker", market_code),
+        market_code=market_code,
     )
     assert all(code in all_tickers for code in market_code), "Not exist market_code list in all_tickers"
 

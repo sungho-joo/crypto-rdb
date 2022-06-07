@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# mypy: ignore-errors
 
 """
 API functions based on FastAPI
@@ -8,12 +9,11 @@ Author:
     Email: triangle124@gmail.com
 """
 
+from stat.repository import TickerDBRepository
+from stat.schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
+from stat.utils import check_date_valid
 
 from fastapi import APIRouter
-
-from .repository import TickerDBRepository
-from .schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
-from .utils import check_date_valid
 
 repository = TickerDBRepository()
 
@@ -68,7 +68,7 @@ def get_ask_accumlation_range(
 
     ask_accum_list = []
     for i, ticker_id in enumerate(ticker_ids):
-        ask_acc, cols = repository.get_ask_acc_volume(ticker_id, start_date, end_date)
+        ask_acc, cols = repository.get_acc_ask_volume(ticker_id, start_date, end_date)
         ask_accum_list.append(StatGetOut(stat_name=cols[0], value=ask_acc, market_code=market_code[i]))
     return StatsGetOut(stats=ask_accum_list)
 
@@ -93,6 +93,6 @@ def get_bid_accumlation_range(
     for i, ticker_id in enumerate(ticker_ids):
         bid_accum, cols = repository.get_acc_bid_volume(ticker_id, start_date, end_date)
         bid_accum_list.append(
-            StatGetOut(stat_name=cols[0], value=bid_accum, market_code=market_code[i])
+            StatGetOut(stat_name=cols[0], value=bid_accum, market_code=market_code[i]),
         )
     return StatsGetOut(stats=bid_accum_list)
