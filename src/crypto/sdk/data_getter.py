@@ -11,6 +11,7 @@ Author:
 
 from typing import Any, Dict, List
 
+import pandas as pd
 import requests
 
 
@@ -31,6 +32,9 @@ class DataGetter:
         """Get stats"""
         return self._stats
 
+    def __repr__(self):
+        return f"Data getter for {self.market_codes}"
+
     @classmethod
     def _get_stat_name(cls, stat_name: str) -> str:
         stat_dict = {
@@ -40,22 +44,27 @@ class DataGetter:
         }
         return stat_dict[stat_name]
 
-    def get_stat_data(self, stat_name: str, start_date: str, end_date: str) -> str:
+    def get_stat_range_data(self, stat_name: str, start_date: str, end_date: str) -> str:
         """Get stat"""
         headers = {"Content-Type": "application/json"}
         url = self._url + "/stat/" + self._get_stat_name(stat_name) + "/"
         payload = self._get_payload(start_date, end_date)
 
         response = requests.post(url, headers=headers, json=payload)
-        status_code, response_body = (
-            response.status_code,
-            response.json(),
-        )
+
+        status_code, response_body = response.status_code, response.json()
 
         if status_code == 200:
-            return response_body
+            ret = dict()
+            for data in response_body["stats"]:
+                ret[data["market_code"]] = pd.DataFrame.from_dict(
+                    data["value"],
+                    orient="index",
+                    columns=["Trade date", "Trade time", data["stat_name"]],
+                )
+            return ret
         else:
-            return f"Error occured while getting data: {response_body}"
+            raise Exception(f'Error occured while getting data: {response_body["detail"]}')
 
     def _get_payload(self, start_date: str, end_date: str) -> Dict[str, Any]:
         return {

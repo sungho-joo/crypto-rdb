@@ -97,7 +97,7 @@ class TickerDBRepository:
         end_date: datetime.date,
     ) -> Tuple[Dict[int, Tuple[Any, ...]], List[str]]:
         """Get trade prices about a ticker"""
-        stmt = db.select(Trade.trade_price).where(
+        stmt = db.select(Trade.trade_date, Trade.trade_time, Trade.trade_price).where(
             db.and_(
                 Trade.ticker_id == ticker_id,
                 start_date <= Trade.trade_date,
