@@ -13,12 +13,12 @@ from contextlib import AbstractAsyncContextManager
 from typing import Callable, Dict, List
 
 import pyupbit
-import sqlalchemy as db
+import sqlalchemy as sa
 from pyupbit import WebSocketManager
 from sqlalchemy.orm import Session
 
-from crypto.db.database import Database
-from crypto.db.tables import Accum, Diff, Price, Ticker, Trade
+from db.database import Database
+from db.tables import Accum, Diff, Price, Ticker, Trade
 
 Database().create_database()
 
@@ -39,7 +39,7 @@ class WebSocket:
         self.session_factory = session_factory
         self._websocket = ext_websocket
 
-    def get_existing_tickers(self, stmt: db.sql.Select) -> List[Ticker]:
+    def get_existing_tickers(self, stmt: sa.sql.Select) -> List[Ticker]:
         """Get existing records from Ticker table"""
         records = []
         with self.session_factory() as session:
@@ -51,7 +51,7 @@ class WebSocket:
 
     def insert_into_ticker_table(self, code_idx: Dict[str, int]) -> None:
         """Insert data into Ticker table"""
-        records = self.get_existing_tickers(db.select(Ticker))
+        records = self.get_existing_tickers(sa.select(Ticker))
 
         selected_code = set()
         for record in records:

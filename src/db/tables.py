@@ -8,9 +8,9 @@ Author:
     Email: kid33629@gmail.com
 """
 
-import sqlalchemy as db
+import sqlalchemy as sa
 
-from crypto.db.database import Base
+from db.database import Base
 
 
 class Ticker(Base):  # pylint: disable=too-few-public-methods
@@ -20,8 +20,8 @@ class Ticker(Base):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "ticker"
 
-    id = db.Column(db.Integer, primary_key=True)
-    market_code = db.Column(db.VARCHAR(20), nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    market_code = sa.Column(sa.VARCHAR(20), nullable=False)
 
     def __repr__(self) -> str:
         return f"Ticker(id={self.id!r}, market_code={self.market_code!r})"
@@ -34,14 +34,14 @@ class Trade(Base):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "trade"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    trade_date = db.Column(db.DATE, nullable=False)
-    trade_time = db.Column(db.TIME, nullable=False)
-    trade_volume = db.Column(db.FLOAT(30), nullable=False)
-    trade_price = db.Column(db.FLOAT(30), nullable=False)
-    ticker_id = db.Column(
-        db.Integer,
-        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    trade_date = sa.Column(sa.DATE, nullable=False)
+    trade_time = sa.Column(sa.TIME, nullable=False)
+    trade_volume = sa.Column(sa.FLOAT(30), nullable=False)
+    trade_price = sa.Column(sa.FLOAT(30), nullable=False)
+    ticker_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:
@@ -59,14 +59,14 @@ class Accum(Base):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "accum"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    acc_ask_volume = db.Column(db.FLOAT(30), nullable=False)
-    acc_bid_volume = db.Column(db.FLOAT(30), nullable=False)
-    acc_trade_volume = db.Column(db.FLOAT(30), nullable=False)
-    acc_trade_price = db.Column(db.FLOAT(30), nullable=False)
-    ticker_id = db.Column(
-        db.Integer,
-        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    acc_ask_volume = sa.Column(sa.FLOAT(30), nullable=False)
+    acc_bid_volume = sa.Column(sa.FLOAT(30), nullable=False)
+    acc_trade_volume = sa.Column(sa.FLOAT(30), nullable=False)
+    acc_trade_price = sa.Column(sa.FLOAT(30), nullable=False)
+    ticker_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:
@@ -84,13 +84,13 @@ class Price(Base):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "price"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    opening_price = db.Column(db.FLOAT(30), nullable=False)
-    high_price = db.Column(db.FLOAT(30), nullable=False)
-    low_price = db.Column(db.FLOAT(30), nullable=False)
-    ticker_id = db.Column(
-        db.Integer,
-        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    opening_price = sa.Column(sa.FLOAT(30), nullable=False)
+    high_price = sa.Column(sa.FLOAT(30), nullable=False)
+    low_price = sa.Column(sa.FLOAT(30), nullable=False)
+    ticker_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:
@@ -108,14 +108,14 @@ class Diff(Base):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "diff"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    closing_price = db.Column(db.FLOAT(30), nullable=False)
-    change_state = db.Column(db.VARCHAR(10), nullable=False)
-    change_price = db.Column(db.FLOAT(30), nullable=False)
-    change_rate = db.Column(db.FLOAT(30), nullable=False)
-    ticker_id = db.Column(
-        db.Integer,
-        db.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    closing_price = sa.Column(sa.FLOAT(30), nullable=False)
+    change_state = sa.Column(sa.VARCHAR(10), nullable=False)
+    change_price = sa.Column(sa.FLOAT(30), nullable=False)
+    change_rate = sa.Column(sa.FLOAT(30), nullable=False)
+    ticker_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey("ticker.id", ondelete="RESTRICT", onupdate="CASCADE"),
     )
 
     def __repr__(self) -> str:

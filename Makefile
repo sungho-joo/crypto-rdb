@@ -34,4 +34,4 @@ init:
 	bash ./hooks/install.sh
 
 run-server:
-	PYTHONPATH=src/ uvicorn src.main:app --host=0.0.0.0 --port 8085 --reload
+	PYTHONPATH=src/ uvicorn src.main:app --host=0.0.0.0 --port 8888 --reload

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 
-import crypto.stat.controller as stat_controller
+import stats.controller as stat_controller
 
 main_path = Path(os.path.abspath(__file__))
 os.chdir(main_path.parent)

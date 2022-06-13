@@ -11,9 +11,9 @@ Author:
 
 from fastapi import APIRouter
 
-from crypto.stat.repository import TickerDBRepository
-from crypto.stat.schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
-from crypto.stat.utils import check_date_valid
+from stats.repository import TickerDBRepository
+from stats.schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
+from stats.utils import check_date_valid
 
 repository = TickerDBRepository()
 
