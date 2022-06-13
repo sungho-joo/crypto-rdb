@@ -17,7 +17,7 @@ from stats.utils import check_date_valid
 
 repository = TickerDBRepository()
 
-router = APIRouter(prefix="/stat", tags=["stat"], responses={404: {"description": "Not found"}})
+router = APIRouter(prefix="/stats", tags=["stats"], responses={404: {"description": "Not found"}})
 
 
 @router.get("/tickers", response_model=TickersGetOut)

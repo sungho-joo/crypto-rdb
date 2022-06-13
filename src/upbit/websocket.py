@@ -9,10 +9,10 @@ Author:
     Email: kid33629@gmail.com
 """
 
+import argparse
 from contextlib import AbstractAsyncContextManager
 from typing import Callable, Dict, List
 
-import pyupbit
 import sqlalchemy as sa
 from pyupbit import WebSocketManager
 from sqlalchemy.orm import Session
@@ -21,9 +21,11 @@ from db.database import Database
 from db.tables import Accum, Diff, Price, Ticker, Trade
 
 Database().create_database()
+argparser = argparse.ArgumentParser()
+argparser.add_argument("--market-code", type=str, nargs="+", help="market code")
 
 
-class WebSocket:
+class UpbitWebSocket:
     """Websocket wrapper Class"""
 
     def __init__(
@@ -113,16 +115,15 @@ class WebSocket:
 
 
 if __name__ == "__main__":
-    all_tickers = pyupbit.get_tickers()
-    market_code = ["KRW-BTC", "KRW-ETH"]
-    websocket = WebSocket(
-        ext_websocket=WebSocketManager("ticker", market_code),
-        market_code=market_code,
+    args = argparser.parse_args()
+
+    websocket = UpbitWebSocket(
+        ext_websocket=WebSocketManager("ticker", args.market_code),
+        market_code=args.market_code,
     )
-    assert all(code in all_tickers for code in market_code), "Not exist market_code list in all_tickers"
 
     market_code_idx = {}
-    for i, code in enumerate(market_code):
+    for i, code in enumerate(args.market_code):
         market_code_idx[code] = i + 1
     websocket.insert_into_ticker_table(market_code_idx)
 

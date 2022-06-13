@@ -20,25 +20,6 @@ services:
       timeout: 5s
       retries: 5
 
-  upbit:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-    container_name: upbit-websocket-server
-    ports:
-      - "7777:7777"
-    environment:
-      TZ: Asia/Seoul
-      PYTHONPATH: ${PYTHONPATH}:/usr/app/src
-    command:
-      bash -c "python src/websocket/insert_data.py"
-    tty: true
-    volumes:
-      - $PWD/src:/usr/app/src
-    depends_on:
-      db:
-        condition: service_healthy
-
   api:
     build:
       context: .

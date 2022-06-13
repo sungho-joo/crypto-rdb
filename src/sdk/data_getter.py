@@ -47,7 +47,7 @@ class DataGetter:
     def get_stat_range_data(self, stat_name: str, start_date: str, end_date: str) -> str:
         """Get stat"""
         headers = {"Content-Type": "application/json"}
-        url = self._url + "/stat/" + self._get_stat_name(stat_name) + "/"
+        url = self._url + "/stats/" + self._get_stat_name(stat_name) + "/"
         payload = self._get_payload(start_date, end_date)
 
         response = requests.post(url, headers=headers, json=payload)
