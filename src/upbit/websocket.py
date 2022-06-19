@@ -20,7 +20,8 @@ from sqlalchemy.orm import Session
 from db.database import Database
 from db.model import Accum, Diff, Price, Ticker, Trade
 
-Database().create_database()
+argparser = argparse.ArgumentParser()
+argparser.add_argument("--market-code", type=str, nargs="+", help="market code")
 
 
 class UpbitWebSocket:

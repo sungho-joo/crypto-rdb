@@ -13,13 +13,13 @@ from typing import List
 from pydantic import BaseModel
 
 
-class TickersGetOut(BaseModel):
+class TickersList(BaseModel):
     """DTO for a Ticker."""
 
     ticker_list: List[str]
 
 
-class ScrapeDataIn(BaseModel):
+class TickerDataIn(BaseModel):
     """DTO for a scrape data"""
 
     market_code: List[str]

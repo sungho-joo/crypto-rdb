@@ -22,6 +22,7 @@ class Ticker(Base):  # pylint: disable=too-few-public-methods
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     market_code = sa.Column(sa.VARCHAR(20), nullable=False)
+    pid = sa.Column(sa.Integer)
 
     def __repr__(self) -> str:
         return f"Ticker(id={self.id!r}, market_code={self.market_code!r})"
