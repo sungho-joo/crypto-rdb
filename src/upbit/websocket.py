@@ -39,20 +39,22 @@ class UpbitWebSocket:
         self.session_factory = session_factory
         self._websocket = ext_websocket
 
-    def get_existing_tickers(self, stmt: sa.sql.Select) -> List[Ticker]:
+    def get_existing_tickers(self, stmt: sa.sql.Select) -> Dict[str, int]:
         """Get existing records from Ticker table"""
         with self.session_factory() as session:
             records = session.execute(stmt).all()
-        return records
+
+        existed_code = dict()
+        for idx, record in enumerate(records):
+            existed_code[record[0].market_code] = idx
+        return existed_code
 
     def insert_into_ticker_table(self, market_code: str) -> None:
         """Insert data into Ticker table"""
-        selected_code = set()
-        for record in self.get_existing_tickers(sa.select(Ticker)):
-            selected_code.add(record[0].market_code)
+        existed_code = self.get_existing_tickers(sa.select(Ticker))
 
         objects = []
-        if market_code not in selected_code:
+        if market_code not in existed_code:
             objects.append(
                 Ticker(id=None, market_code=market_code),
             )
@@ -61,10 +63,15 @@ class UpbitWebSocket:
             session.add_all(objects)
             session.commit()
 
-    def insert_into_other_tables(self, code_idx: Dict[str, int]) -> None:
+    def insert_into_other_tables(self, market_code: str) -> None:
         """Insert data into other tables (e.g., Trade, Accum, Price, Diff)"""
+        existed_code = self.get_existing_tickers(sa.select(Ticker))
+
         while True:
             data = self._websocket.get()
+            assert (
+                market_code == data["code"]
+            ), "The market code is different a code from the websocket."
 
             objects = [
                 Trade(
@@ -73,7 +80,7 @@ class UpbitWebSocket:
                     trade_time=data["trade_time"],
                     trade_volume=data["trade_volume"],
                     trade_price=data["trade_price"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
                 Accum(
                     id=None,
@@ -81,14 +88,14 @@ class UpbitWebSocket:
                     acc_bid_volume=data["acc_bid_volume"],
                     acc_trade_volume=data["acc_trade_volume"],
                     acc_trade_price=data["acc_trade_price"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
                 Price(
                     id=None,
                     opening_price=data["opening_price"],
                     high_price=data["high_price"],
                     low_price=data["low_price"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
                 Diff(
                     id=None,
@@ -96,7 +103,7 @@ class UpbitWebSocket:
                     change_state=data["change"],
                     change_price=data["change_price"],
                     change_rate=data["change_rate"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
             ]
 
