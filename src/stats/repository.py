@@ -16,7 +16,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
 from db.database import Database
-from db.tables import Accum, Diff, Price, Ticker, Trade
+from db.model import Accum, Diff, Price, Ticker, Trade
 
 
 class TickerDBRepository:

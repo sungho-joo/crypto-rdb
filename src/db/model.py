@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Creation for tables related to crypto using SQLAlchemy ORM
+Creation for models related to crypto using SQLAlchemy ORM
 
 Author:
     Name: Dongmin Lee
@@ -20,7 +20,7 @@ class Ticker(Base):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "ticker"
 
-    id = sa.Column(sa.Integer, primary_key=True)
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     market_code = sa.Column(sa.VARCHAR(20), nullable=False)
 
     def __repr__(self) -> str:

@@ -18,11 +18,9 @@ from pyupbit import WebSocketManager
 from sqlalchemy.orm import Session
 
 from db.database import Database
-from db.tables import Accum, Diff, Price, Ticker, Trade
+from db.model import Accum, Diff, Price, Ticker, Trade
 
 Database().create_database()
-argparser = argparse.ArgumentParser()
-argparser.add_argument("--market-code", type=str, nargs="+", help="market code")
 
 
 class UpbitWebSocket:
@@ -43,28 +41,21 @@ class UpbitWebSocket:
 
     def get_existing_tickers(self, stmt: sa.sql.Select) -> List[Ticker]:
         """Get existing records from Ticker table"""
-        records = []
         with self.session_factory() as session:
-            print(f"Columns: {list(session.execute(stmt).keys())}")
             records = session.execute(stmt).all()
-            for i, record in enumerate(records):
-                print(f"{i}: {record}")
         return records
 
-    def insert_into_ticker_table(self, code_idx: Dict[str, int]) -> None:
+    def insert_into_ticker_table(self, market_code: str) -> None:
         """Insert data into Ticker table"""
-        records = self.get_existing_tickers(sa.select(Ticker))
-
         selected_code = set()
-        for record in records:
+        for record in self.get_existing_tickers(sa.select(Ticker)):
             selected_code.add(record[0].market_code)
 
         objects = []
-        for key, value in code_idx.items():
-            if key not in selected_code:
-                objects.append(
-                    Ticker(id=value, market_code=key),
-                )
+        if market_code not in selected_code:
+            objects.append(
+                Ticker(id=None, market_code=market_code),
+            )
 
         with self.session_factory() as session:
             session.add_all(objects)
@@ -115,6 +106,8 @@ class UpbitWebSocket:
 
 
 if __name__ == "__main__":
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("--market-code", type=str, nargs="+", help="market code")
     args = argparser.parse_args()
 
     websocket = UpbitWebSocket(
@@ -122,9 +115,6 @@ if __name__ == "__main__":
         market_code=args.market_code,
     )
 
-    market_code_idx = {}
-    for i, code in enumerate(args.market_code):
-        market_code_idx[code] = i + 1
-    websocket.insert_into_ticker_table(market_code_idx)
+    websocket.insert_into_ticker_table(args.market_code)
 
-    websocket.insert_into_other_tables(market_code_idx)
+    websocket.insert_into_other_tables(args.market_code)

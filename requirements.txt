@@ -1,6 +1,9 @@
 cryptography==36.0.1
 docker==5.0.3
 fastapi==0.75.1
+jupyter==1.0.0
+jupyter-contrib-nbextensions==0.5.1
+jupyter-nbextensions-configurator==0.4.1
 psycopg2==2.9.3
 pyupbit==0.2.22
 SQLAlchemy==1.4.31

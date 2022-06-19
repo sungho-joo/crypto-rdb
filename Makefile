@@ -8,6 +8,8 @@ all: format lint
 format:
 	black .
 	isort .
+	nbqa black .
+	nbqa isort .
 
 lint:
 	pytest src/ --pylint --flake8 --mypy
@@ -23,14 +25,17 @@ else
 	@echo "No Staged Python File in the src folder"
 endif
 
-init-dev:
-	make init
-	pip install -r requirements-dev.txt
-
 init:
 	pip install -U pip
 	pip install -e .
 	pip install -r requirements.txt
+	jupyter contrib nbextension install --user
+	jupyter nbextensions_configurator enable --user
+	python3 -m ipykernel install --user
+
+init-dev:
+	make init
+	pip install -r requirements-dev.txt
 	bash ./hooks/install.sh
 
 run-server:
