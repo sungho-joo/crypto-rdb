@@ -10,12 +10,13 @@ Author:
 """
 
 import os
+from typing import Optional
 
 import pyupbit
 from fastapi import APIRouter
 
 from upbit.repository import UpbitDBRepository
-from upbit.schema import TickerDataIn, TickersList
+from upbit.schema import TickerDataIn, TickerDataListOut, TickerDataOut, TickersList
 from upbit.utils import check_market_code_valid, run_cmd
 
 router = APIRouter(prefix="/upbit", tags=["upbit"], responses={404: {"description": "Not found"}})
@@ -30,17 +31,20 @@ def get_tickers() -> TickersList:
     return TickersList(ticker_list=tickers)
 
 
-@router.get("/tickers/active", response_model=TickersList)
+@router.get("/tickers/active", response_model=TickerDataListOut)
 def get_active_tickers() -> TickersList:
     """Get all active tickers"""
-    active_tickers = repository.get_active_tickers()
-    return TickersList(ticker_list=active_tickers)
+    ticker_pid = repository.get_active_tickers()
+    return TickerDataListOut(
+        ticker_list=[TickerDataOut(market_code=ticker, pid=pid) for ticker, pid in ticker_pid.items()],
+    )
 
 
-@router.post("/tickers", response_model=None)
+# pylint: disable=inconsistent-return-statements
+@router.post("/tickers", response_model=TickerDataListOut)
 def turnon_data(
     request_body: TickerDataIn,
-) -> None:
+) -> Optional[TickerDataListOut]:
     """Start websocket scraping for given market codes"""
     market_code = request_body.market_code
     stat = request_body.stat
@@ -51,6 +55,7 @@ def turnon_data(
     if stat:
         return
 
+    ticker_data_list = []
     for market_code in market_code:
         pid = repository.get_ticker_pid(market_code)
         if pid:
@@ -58,7 +63,10 @@ def turnon_data(
 
         cmd = f"PYTHONPATH=/usr/app/src/ python upbit/websocket.py --market-code {market_code}"
         pid = run_cmd(cmd)
+
         repository.update_ticker_pid(market_code, pid)
+        ticker_data_list.append(TickerDataOut(market_code=market_code, pid=pid))
+    return TickerDataListOut(ticker_list=ticker_data_list)
 
 
 @router.post("/tickers/stop", response_model=None)

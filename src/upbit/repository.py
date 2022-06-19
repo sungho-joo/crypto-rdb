@@ -9,13 +9,13 @@ Author:
 """
 
 from contextlib import AbstractContextManager
-from typing import Any, Callable, List
+from typing import Any, Callable, Dict
 
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
 from db.database import Database
-from db.tables import Ticker
+from db.model import Ticker
 
 
 class UpbitDBRepository:
@@ -34,6 +34,7 @@ class UpbitDBRepository:
         """Insert pid to pid table"""
 
         stmt = sa.update(Ticker).where(Ticker.market_code == market_code).values(pid=pid)
+
         with self.session_factory() as session:
             session.execute(stmt)
             session.commit()
@@ -53,14 +54,14 @@ class UpbitDBRepository:
         with self.session_factory() as session:
             pid = session.execute(stmt).fetchone()
 
-        print(market_code, pid)
         return pid[0] if pid else None
 
-    def get_active_tickers(self) -> List[str]:
+    def get_active_tickers(self) -> Dict[str, Any]:
         """Get active tickers from ticker table"""
 
-        stmt = sa.select(Ticker.market_code).where(Ticker.pid is not None)
+        stmt = sa.select(Ticker.market_code, Ticker.pid).where(Ticker.pid.isnot(None))
 
         with self.session_factory() as session:
-            tickers = session.execute(stmt).fetchall()
-        return [ticker[0] for ticker in tickers]
+            ticker_pid_list = session.execute(stmt).fetchall()
+
+            return dict(ticker_pid_list)

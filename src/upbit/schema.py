@@ -8,7 +8,7 @@ Author:
     Email: triangle124@gmail.com
 """
 
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -24,3 +24,16 @@ class TickerDataIn(BaseModel):
 
     market_code: List[str]
     stat: str
+
+
+class TickerDataOut(BaseModel):
+    """DTO for a scrape data"""
+
+    market_code: str
+    pid: Optional[int]
+
+
+class TickerDataListOut(BaseModel):
+    """DTO for a scrape data"""
+
+    ticker_list: List[TickerDataOut]

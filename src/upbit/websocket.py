@@ -46,8 +46,8 @@ class UpbitWebSocket:
             records = session.execute(stmt).all()
 
         existed_code = dict()
-        for idx, record in enumerate(records):
-            existed_code[record[0].market_code] = idx
+        for record in records:
+            existed_code[record[0].market_code] = record[0].id
         return existed_code
 
     def insert_into_ticker_table(self, market_code: str) -> None:
@@ -123,6 +123,6 @@ if __name__ == "__main__":
         market_code=args.market_code,
     )
 
-    websocket.insert_into_ticker_table(args.market_code)
+    websocket.insert_into_ticker_table(args.market_code[0])
 
-    websocket.insert_into_other_tables(args.market_code)
+    websocket.insert_into_other_tables(args.market_code[0])

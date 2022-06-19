@@ -26,12 +26,12 @@ services:
       dockerfile: ./docker/Dockerfile
     container_name: fastapi-server
     ports:
-      - "8888:8888"
+      - "7777:7777"
     environment:
       TZ: Asia/Seoul
       PYTHONPATH: ${PYTHONPATH}:/usr/app/src
     command:
-      bash -c "PYTHONPATH=src/ uvicorn src.main:app --host=0.0.0.0 --port 8888 --reload"
+      bash -c "PYTHONPATH=src/ uvicorn src.main:app --host=0.0.0.0 --port 7777 --reload"
     tty: true
     volumes:
       - $PWD/src:/usr/app/src
