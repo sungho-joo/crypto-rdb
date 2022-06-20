@@ -1,8 +1,18 @@
 """Main function initializing fastapi app"""
 
-import stat.controller as stat_controller
+import os
+from pathlib import Path
 
 from fastapi import FastAPI
+
+import stats.controller as stat_controller
+import upbit.controller as upbit_controller
+from db.database import Database
+
+main_path = Path(os.path.abspath(__file__))
+os.chdir(main_path.parent)
+
+Database().create_database()
 
 
 def create_app() -> FastAPI:
@@ -12,6 +22,7 @@ def create_app() -> FastAPI:
 
     # Add routers
     app_.include_router(stat_controller.router)
+    app_.include_router(upbit_controller.router)
 
     return app_
 

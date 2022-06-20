@@ -9,15 +9,15 @@ Author:
     Email: triangle124@gmail.com
 """
 
-from stat.repository import TickerDBRepository
-from stat.schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
-from stat.utils import check_date_valid
-
 from fastapi import APIRouter
+
+from stats.repository import TickerDBRepository
+from stats.schema import StatGetIn, StatGetOut, StatsGetOut, TickersGetOut
+from stats.utils import check_date_valid
 
 repository = TickerDBRepository()
 
-router = APIRouter(prefix="/stat", tags=["stat"], responses={404: {"description": "Not found"}})
+router = APIRouter(prefix="/stats", tags=["stats"], responses={404: {"description": "Not found"}})
 
 
 @router.get("/tickers", response_model=TickersGetOut)

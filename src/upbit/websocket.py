@@ -9,21 +9,22 @@ Author:
     Email: kid33629@gmail.com
 """
 
+import argparse
 from contextlib import AbstractAsyncContextManager
 from typing import Callable, Dict, List
 
-import pyupbit
-import sqlalchemy as db
+import sqlalchemy as sa
 from pyupbit import WebSocketManager
 from sqlalchemy.orm import Session
 
 from db.database import Database
-from db.tables import Accum, Diff, Price, Ticker, Trade
+from db.model import Accum, Diff, Price, Ticker, Trade
 
-Database().create_database()
+argparser = argparse.ArgumentParser()
+argparser.add_argument("--market-code", type=str, nargs="+", help="market code")
 
 
-class WebSocket:
+class UpbitWebSocket:
     """Websocket wrapper Class"""
 
     def __init__(
@@ -39,39 +40,39 @@ class WebSocket:
         self.session_factory = session_factory
         self._websocket = ext_websocket
 
-    def get_existing_tickers(self, stmt: db.sql.Select) -> List[Ticker]:
+    def get_existing_tickers(self, stmt: sa.sql.Select) -> Dict[str, int]:
         """Get existing records from Ticker table"""
-        records = []
         with self.session_factory() as session:
-            print(f"Columns: {list(session.execute(stmt).keys())}")
             records = session.execute(stmt).all()
-            for i, record in enumerate(records):
-                print(f"{i}: {record}")
-        return records
 
-    def insert_into_ticker_table(self, code_idx: Dict[str, int]) -> None:
-        """Insert data into Ticker table"""
-        records = self.get_existing_tickers(db.select(Ticker))
-
-        selected_code = set()
+        existed_code = dict()
         for record in records:
-            selected_code.add(record[0].market_code)
+            existed_code[record[0].market_code] = record[0].id
+        return existed_code
+
+    def insert_into_ticker_table(self, market_code: str) -> None:
+        """Insert data into Ticker table"""
+        existed_code = self.get_existing_tickers(sa.select(Ticker))
 
         objects = []
-        for key, value in code_idx.items():
-            if key not in selected_code:
-                objects.append(
-                    Ticker(id=value, market_code=key),
-                )
+        if market_code not in existed_code:
+            objects.append(
+                Ticker(id=None, market_code=market_code),
+            )
 
         with self.session_factory() as session:
             session.add_all(objects)
             session.commit()
 
-    def insert_into_other_tables(self, code_idx: Dict[str, int]) -> None:
+    def insert_into_other_tables(self, market_code: str) -> None:
         """Insert data into other tables (e.g., Trade, Accum, Price, Diff)"""
+        existed_code = self.get_existing_tickers(sa.select(Ticker))
+
         while True:
             data = self._websocket.get()
+            assert (
+                market_code == data["code"]
+            ), "The market code is different a code from the websocket."
 
             objects = [
                 Trade(
@@ -80,7 +81,7 @@ class WebSocket:
                     trade_time=data["trade_time"],
                     trade_volume=data["trade_volume"],
                     trade_price=data["trade_price"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
                 Accum(
                     id=None,
@@ -88,14 +89,14 @@ class WebSocket:
                     acc_bid_volume=data["acc_bid_volume"],
                     acc_trade_volume=data["acc_trade_volume"],
                     acc_trade_price=data["acc_trade_price"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
                 Price(
                     id=None,
                     opening_price=data["opening_price"],
                     high_price=data["high_price"],
                     low_price=data["low_price"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
                 Diff(
                     id=None,
@@ -103,7 +104,7 @@ class WebSocket:
                     change_state=data["change"],
                     change_price=data["change_price"],
                     change_rate=data["change_rate"],
-                    ticker_id=code_idx[data["code"]],
+                    ticker_id=existed_code[market_code],
                 ),
             ]
 
@@ -113,17 +114,15 @@ class WebSocket:
 
 
 if __name__ == "__main__":
-    all_tickers = pyupbit.get_tickers()
-    market_code = ["KRW-BTC", "KRW-ETH"]
-    websocket = WebSocket(
-        ext_websocket=WebSocketManager("ticker", market_code),
-        market_code=market_code,
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("--market-code", type=str, nargs="+", help="market code")
+    args = argparser.parse_args()
+
+    websocket = UpbitWebSocket(
+        ext_websocket=WebSocketManager("ticker", args.market_code),
+        market_code=args.market_code,
     )
-    assert all(code in all_tickers for code in market_code), "Not exist market_code list in all_tickers"
 
-    market_code_idx = {}
-    for i, code in enumerate(market_code):
-        market_code_idx[code] = i + 1
-    websocket.insert_into_ticker_table(market_code_idx)
+    websocket.insert_into_ticker_table(args.market_code[0])
 
-    websocket.insert_into_other_tables(market_code_idx)
+    websocket.insert_into_other_tables(args.market_code[0])
