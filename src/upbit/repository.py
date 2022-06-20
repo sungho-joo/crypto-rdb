@@ -39,6 +39,14 @@ class UpbitDBRepository:
             session.execute(stmt)
             session.commit()
 
+    def check_ticker_existence(self, market_code: str) -> bool:
+        """Check ticker existence from ticker table"""
+
+        stmt = sa.select(Ticker.market_code).where(Ticker.market_code == market_code)
+        with self.session_factory() as session:
+            ticker_code = session.execute(stmt).fetchone()
+        return bool(ticker_code is not None)
+
     def remove_ticker_pid(self, market_code: str) -> None:
         """Remove pid from pid table"""
 
@@ -59,9 +67,8 @@ class UpbitDBRepository:
     def get_active_tickers(self) -> Dict[str, Any]:
         """Get active tickers from ticker table"""
 
-        stmt = sa.select(Ticker.market_code, Ticker.pid).where(Ticker.pid.isnot(None))
+        stmt = sa.select(Ticker.market_code, Ticker.pid).where(Ticker.pid.is_not(None))
 
         with self.session_factory() as session:
             ticker_pid_list = session.execute(stmt).fetchall()
-
-            return dict(ticker_pid_list)
+            return dict(tuple(ticker_pid_list))

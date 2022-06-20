@@ -10,6 +10,7 @@ Author:
 """
 
 import os
+import time
 from typing import Optional
 
 import pyupbit
@@ -46,23 +47,30 @@ def turnon_data(
     request_body: TickerDataIn,
 ) -> Optional[TickerDataListOut]:
     """Start websocket scraping for given market codes"""
-    market_code = request_body.market_code
+    market_codes = request_body.market_codes
     stat = request_body.stat
 
-    check_market_code_valid(market_code)
+    check_market_code_valid(market_codes)
 
     # TBD: when stat is given
     if stat:
         return
 
     ticker_data_list = []
-    for market_code in market_code:
+    for market_code in market_codes:
         pid = repository.get_ticker_pid(market_code)
         if pid:
             os.kill(pid, 9)
 
         cmd = f"PYTHONPATH=/usr/app/src/ python upbit/websocket.py --market-code {market_code}"
         pid = run_cmd(cmd)
+
+        cnt = 0
+        while cnt < 30:
+            if repository.check_ticker_existence(market_code):
+                break
+            cnt += 1
+            time.sleep(1)
 
         repository.update_ticker_pid(market_code, pid)
         ticker_data_list.append(TickerDataOut(market_code=market_code, pid=pid))

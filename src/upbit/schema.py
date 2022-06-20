@@ -22,8 +22,8 @@ class TickersList(BaseModel):
 class TickerDataIn(BaseModel):
     """DTO for a scrape data"""
 
-    market_code: List[str]
-    stat: str
+    market_codes: List[str]
+    stat: str = ""
 
 
 class TickerDataOut(BaseModel):
