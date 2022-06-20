@@ -8,8 +8,8 @@ all: format lint
 format:
 	black .
 	isort .
-	# nbqa black .
-	# nbqa isort .
+	nbqa black .
+	nbqa isort .
 
 lint:
 	pytest src/ --pylint --flake8 --mypy
