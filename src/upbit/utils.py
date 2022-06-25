@@ -15,13 +15,13 @@ import pyupbit
 from fastapi import HTTPException
 
 
-def check_market_code_valid(market_codes: List[str]) -> None:
-    """Check if market code is valid"""
+def check_ticker_valid(ticker_list: List[str]) -> None:
+    """Check if ticker is valid"""
     all_tickers = set(pyupbit.get_tickers())
-    market_code_set = set(market_codes)
+    ticker_set = set(ticker_list)
 
-    if market_code_set - all_tickers != set():
-        raise HTTPException(status_code=400, detail="Invalid market code")
+    if ticker_set - all_tickers != set():
+        raise HTTPException(status_code=400, detail="Invalid ticker")
 
 
 def run_cmd(cmd: str) -> int:
