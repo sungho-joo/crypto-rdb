@@ -22,14 +22,14 @@ class TickersList(BaseModel):
 class TickerDataIn(BaseModel):
     """DTO for a scrape data"""
 
-    market_codes: List[str]
-    stat: str = ""
+    ticker_list: List[str]
+    stats: Optional[str] = None
 
 
 class TickerDataOut(BaseModel):
     """DTO for a scrape data"""
 
-    market_code: str
+    ticker: str
     pid: Optional[int]
 
 

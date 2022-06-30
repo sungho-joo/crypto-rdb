@@ -18,7 +18,7 @@ from fastapi import APIRouter
 
 from upbit.repository import UpbitDBRepository
 from upbit.schema import TickerDataIn, TickerDataListOut, TickerDataOut, TickersList
-from upbit.utils import check_market_code_valid, run_cmd
+from upbit.utils import check_ticker_valid, run_cmd
 
 router = APIRouter(prefix="/upbit", tags=["upbit"], responses={404: {"description": "Not found"}})
 
@@ -37,57 +37,60 @@ def get_active_tickers() -> TickersList:
     """Get all active tickers"""
     ticker_pid = repository.get_active_tickers()
     return TickerDataListOut(
-        ticker_list=[TickerDataOut(market_code=ticker, pid=pid) for ticker, pid in ticker_pid.items()],
+        ticker_list=[TickerDataOut(ticker=ticker, pid=pid) for ticker, pid in ticker_pid.items()],
     )
 
 
 # pylint: disable=inconsistent-return-statements
-@router.post("/tickers", response_model=TickerDataListOut)
-def turnon_data(
+@router.post("/tickers/subscribe", response_model=TickerDataListOut)
+def subscibe_data(
     request_body: TickerDataIn,
 ) -> Optional[TickerDataListOut]:
-    """Start websocket scraping for given market codes"""
-    market_codes = request_body.market_codes
-    stat = request_body.stat
+    """Start websocket scraping for given ticker list"""
+    ticker_list = request_body.ticker_list
+    stat = request_body.stats
 
-    check_market_code_valid(market_codes)
+    check_ticker_valid(ticker_list)
 
     # TBD: when stat is given
     if stat:
         return
 
     ticker_data_list = []
-    for market_code in market_codes:
-        pid = repository.get_ticker_pid(market_code)
+    for ticker in ticker_list:
+        pid = repository.get_ticker_pid(ticker)
         if pid:
             os.kill(pid, 9)
 
-        cmd = f"PYTHONPATH=/usr/app/src/ python upbit/websocket.py --market-code {market_code}"
+        cmd = f"PYTHONPATH=/usr/app/src/ python upbit/websocket.py --market-code {ticker}"
         pid = run_cmd(cmd)
 
         cnt = 0
         while cnt < 30:
-            if repository.check_ticker_existence(market_code):
+            if repository.check_ticker_existence(ticker):
                 break
             cnt += 1
             time.sleep(1)
 
-        repository.update_ticker_pid(market_code, pid)
-        ticker_data_list.append(TickerDataOut(market_code=market_code, pid=pid))
+        repository.update_ticker_pid(ticker, pid)
+        ticker_data_list.append(TickerDataOut(ticker=ticker, pid=pid))
     return TickerDataListOut(ticker_list=ticker_data_list)
 
 
-@router.post("/tickers/stop", response_model=None)
-def turnoff_data(
+@router.post("/tickers/unsubscribe", response_model=TickerDataListOut)
+def unsubscribe_data(
     request_body: TickersList,
-) -> None:
-    """Stop websocket scraping for given market codes"""
-    market_code = request_body.ticker_list
+) -> TickerDataListOut:
+    """Stop websocket scraping for given ticker list"""
+    ticker_list = request_body.ticker_list
 
-    check_market_code_valid(market_code)
+    check_ticker_valid(ticker_list)
 
-    for market_code in market_code:
-        pid = repository.get_ticker_pid(market_code)
+    ticker_data_list = []
+    for ticker in ticker_list:
+        pid = repository.get_ticker_pid(ticker)
         if pid:
             os.kill(pid, 9)
-            repository.update_ticker_pid(market_code, None)
+            repository.update_ticker_pid(ticker, None)
+        ticker_data_list.append(TickerDataOut(ticker=ticker, pid=pid))
+    return TickerDataListOut(ticker_list=ticker_data_list)

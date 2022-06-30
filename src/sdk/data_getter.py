@@ -2,7 +2,7 @@
 # mypy: ignore-errors
 
 """
-API functions based on FastAPI
+SDK for request data from DB
 
 Author:
     Name: Sungho Joo
@@ -20,11 +20,11 @@ class DataGetter:
 
     def __init__(
         self,
-        url: str = "http://localhost:8888",
-        market_codes: List[str] = ["KRW-BTC"],
+        url: str = "http://localhost:7777",
+        ticker_list: List[str] = ["KRW-BTC"],
     ) -> None:
-        self._url = url
-        self.market_codes = market_codes
+        self._url = url + "/stats/"
+        self.ticker_list = ticker_list
         self._stats = ["price", "bid_accumulation", "ask_accumulation"]
 
     @property
@@ -33,7 +33,7 @@ class DataGetter:
         return self._stats
 
     def __repr__(self):
-        return f"Data getter for {self.market_codes}"
+        return f"Data getter for {self.ticker_list}"
 
     @classmethod
     def _get_stat_name(cls, stat_name: str) -> str:
@@ -47,7 +47,7 @@ class DataGetter:
     def get_stat_range_data(self, stat_name: str, start_date: str, end_date: str) -> str:
         """Get stat"""
         headers = {"Content-Type": "application/json"}
-        url = self._url + "/stats/" + self._get_stat_name(stat_name) + "/"
+        url = self._url + self._get_stat_name(stat_name) + "/"
         payload = self._get_payload(start_date, end_date)
 
         response = requests.post(url, headers=headers, json=payload)
@@ -68,7 +68,7 @@ class DataGetter:
 
     def _get_payload(self, start_date: str, end_date: str) -> Dict[str, Any]:
         return {
-            "market_code": self.market_codes,
+            "market_code": self.ticker_list,
             "start_date": start_date,
             "end_date": end_date,
         }
