@@ -1,5 +1,3 @@
-SHELL := /bin/bash
-
 STAGED := $(shell git diff --cached --name-only --diff-filter=ACMR -- 'src/***.py' | sed 's| |\\ |g')
 
 all: format lint
@@ -36,7 +34,10 @@ init:
 init-dev:
 	make init
 	pip install -r requirements-dev.txt
-	bash ./hooks/install.sh
+	bash ./scripts/install.sh
 
-run-server:
-	PYTHONPATH=src/ uvicorn src.main:app --host=0.0.0.0 --port 8888 --reload
+server:
+	docker-compose up -d
+
+server-clean:
+	docker-compose down -v
